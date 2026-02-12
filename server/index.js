@@ -158,6 +158,15 @@ app.get('*', (req, res) =>
     res.sendFile(path.join(__dirname, '../public/index.html'))
 );
 
-app.listen(PORT, () => {
-    console.log(`🚀 http://localhost:${PORT}`);
-});
+// --------------------------------------------------
+// Vercel: a função serverless NÃO deve abrir porta.
+// Local: mantém o app.listen() para desenvolvimento.
+// --------------------------------------------------
+
+if (process.env.VERCEL) {
+    module.exports = app;
+} else {
+    app.listen(PORT, () => {
+        console.log(`🚀 http://localhost:${PORT}`);
+    });
+}
