@@ -13,8 +13,8 @@ function renderHeader() {
             </button>
             <div class="nav-links">
                 <button class="nav-link active" data-page="home">Início</button>
-                <button class="nav-link" data-page="sobre">Quem Somos</button>
-                <button class="nav-link" data-page="noticias">Notícias & Artigos</button>
+                <button class="nav-link" data-page="sobre">Empresa</button>
+                <button class="nav-link" data-page="noticias">Conteúdos</button>
                 <button class="nav-cta" data-page="contato">Contato</button>
             </div>
         </div>
@@ -23,8 +23,8 @@ function renderHeader() {
         <div class="mobile-menu" id="mobileMenu" aria-label="Menu">
             <div class="mobile-menu-inner">
                 <button class="mobile-link active" data-page="home">Início</button>
-                <button class="mobile-link" data-page="sobre">Quem Somos</button>
-                <button class="mobile-link" data-page="noticias">Notícias & Artigos</button>
+                <button class="mobile-link" data-page="sobre">Empresa</button>
+                <button class="mobile-link" data-page="noticias">Conteúdos</button>
                 <button class="mobile-link mobile-cta" data-page="contato">Contato</button>
             </div>
         </div>

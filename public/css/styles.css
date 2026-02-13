@@ -411,7 +411,13 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
 .equipe-card.admin-border { border:2px dashed var(--yellow); }
 .equipe-card:hover { box-shadow:0 12px 40px rgba(28,68,86,.1); transform:translateY(-4px); }
 .equipe-card-top { height:170px; background:linear-gradient(135deg,var(--primary),var(--blue)); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+.equipe-avatar-wrap { position:relative; width:68px; height:68px; }
 .equipe-avatar { width:68px; height:68px; border-radius:50%; border:2px solid rgba(255,255,255,.2); background:rgba(255,255,255,.1); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.45); }
+.equipe-avatar-img { width:68px; height:68px; border-radius:50%; border:2px solid rgba(255,255,255,.2); object-fit:cover; }
+.equipe-avatar-upload-overlay { position:absolute; inset:0; background:rgba(0,0,0,.75); border-radius:50%; display:none; align-items:center; justify-content:center; cursor:pointer; }
+.equipe-avatar-wrap:hover .equipe-avatar-upload-overlay { display:flex; }
+.equipe-avatar-upload-overlay .upload-label { display:flex; flex-direction:column; align-items:center; gap:.25rem; cursor:pointer; color:white; font-family:var(--font-aux); font-size:.5rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:.5rem; text-align:center; }
+.equipe-avatar-upload-overlay .upload-input { display:none; }
 .equipe-card-body { padding:1.5rem; }
 .equipe-role    { font-family:var(--font-aux); font-size:.6rem; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--yellow); margin-bottom:.35rem; }
 .equipe-name    { font-family:var(--font-title); font-size:1.2rem; font-weight:700; color:var(--primary); margin-bottom:.55rem; }

@@ -3,27 +3,51 @@ function renderAreasSection() {
     const areas = [
         {
             num: '01',
-            title: 'Lorem Ipsum Dolor',
-            desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud.',
-            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`
+            title: 'Gestão Pública',
+            desc: 'Atuamos em gestão pública voltada a governos e municípios, com foco em fortalecer a saúde financeira e elevar a capacidade de investimento e entrega de infraestrutura. Apoiamos diagnósticos, planos de ação, melhoria de arrecadação e governança de resultados.',
+            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`
         },
         {
             num: '02',
-            title: 'Sit Amet Consectetur',
-            desc: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate.',
-            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>`
+            title: 'Setor Elétrico',
+            desc: 'Análises regulatórias e econômico-financeiras, apoiando decisões sobre tarifas, incentivos, eficiência e qualidade do serviço, com monitoramento por indicadores para fortalecer escolhas técnicas em ambientes de alta complexidade regulatória.',
+            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`
         },
         {
             num: '03',
-            title: 'Adipiscing Elit Sed',
-            desc: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nemo enim ipsam voluptatem quia voluptas sit.',
-            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`
+            title: 'Saneamento',
+            desc: 'Estudos e apoio técnico para sustentabilidade econômico-financeira, metas e indicadores, estruturação e gestão de contratos, incluindo análises tarifárias e de equilíbrio contratual.',
+            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`
         },
         {
             num: '04',
-            title: 'Eiusmod Tempor',
-            desc: 'Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur vel illum qui dolorem eum fugiat quo voluptas nulla pariatur.',
-            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`
+            title: 'Rodovias',
+            desc: 'Apoio a concessões rodoviárias e gestão de ativos com análises de CAPEX, OPEX, tráfego e níveis de serviço, além de modelos e painéis para operação e governança contratual, orientando decisões em estruturação e reequilíbrios.',
+            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 17l4-10h10l4 10"/><path d="M7 17h10"/><path d="M9 12h6"/></svg>`
+        },
+        {
+            num: '05',
+            title: 'Ferrovias',
+            desc: 'Suporte técnico para projetos e operações ferroviárias com foco em eficiência operacional, capacidade, indicadores e investimentos, estruturando monitoramento e governança para contratos e ativos.',
+            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="M8 19l-2 2M16 19l2 2"/></svg>`
+        },
+        {
+            num: '06',
+            title: 'Mineração',
+            desc: 'Análises de governança regulatória, riscos e conformidade, apoiando decisões e estratégias em um setor sensível a requisitos institucionais, socioambientais e de integridade, organizando premissas e cenários para reduzir incerteza.',
+            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="2" x2="12" y2="22"/><polyline points="2 8.5 12 15 22 8.5"/></svg>`
+        },
+        {
+            num: '07',
+            title: 'Concessões e PPPs',
+            desc: 'Apoio do desenho do projeto à gestão do contrato, com modelagem econômico-financeira, matriz de riscos, mecanismos de remuneração e indicadores, buscando contratos executáveis com governança clara e previsibilidade.',
+            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`
+        },
+        {
+            num: '08',
+            title: 'Pareceres & Coordenação',
+            desc: 'Pareceres técnicos estruturados com análise fundamentada e recomendação objetiva para subsidiar decisões administrativas e regulatórias. Coordenação técnica de projetos complexos com governança, cronograma e acompanhamento de resultados.',
+            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>`
         }
     ];
 
@@ -39,7 +63,7 @@ function renderAreasSection() {
                         <h2 class="section-title-serif">Áreas de<br><em>Atuação</em></h2>
                     </div>
                     <p class="section-desc">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore magna aliqua.
+                        Atuamos com rigor técnico, clareza e compromisso com resultados, transformando complexidade em decisões seguras e aplicáveis no setor de infraestrutura.
                     </p>
                 </div>
 
@@ -57,27 +81,27 @@ function renderAreasSection() {
                 <div class="areas-quote-block">
                     <div class="areas-quote-line"></div>
                     <blockquote class="areas-quote">
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam."
+                        "Na Perceptron, a busca pela excelência orienta cada entrega, do diagnóstico à recomendação final. Atuamos com rigor técnico, clareza e compromisso com resultados."
                     </blockquote>
-                    <div class="areas-quote-author">Dra. Lorem Ipsum — Sócia-Fundadora</div>
+                    <div class="areas-quote-author">Perceptron Consultoria — Nossa Missão</div>
                 </div>
 
                 <div class="areas-numbers-bar">
                     <div class="number-stat">
-                        <div class="number-stat-value">15+</div>
-                        <div class="number-stat-label">Anos de Mercado</div>
+                        <div class="number-stat-value">17+</div>
+                        <div class="number-stat-label">Anos de Experiência</div>
                     </div>
                     <div class="number-stat">
-                        <div class="number-stat-value">320+</div>
-                        <div class="number-stat-label">Clientes Atendidos</div>
-                    </div>
-                    <div class="number-stat">
-                        <div class="number-stat-value">98%</div>
-                        <div class="number-stat-label">Taxa de Satisfação</div>
+                        <div class="number-stat-value">8</div>
+                        <div class="number-stat-label">Áreas de Atuação</div>
                     </div>
                     <div class="number-stat">
                         <div class="number-stat-value">4</div>
-                        <div class="number-stat-label">Especialidades</div>
+                        <div class="number-stat-label">Especialistas</div>
+                    </div>
+                    <div class="number-stat">
+                        <div class="number-stat-value">2</div>
+                        <div class="number-stat-label">Escritórios no Brasil</div>
                     </div>
                 </div>
             </div>

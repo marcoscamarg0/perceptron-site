@@ -7,7 +7,7 @@ function renderFooter() {
                     <img src="/logo.png" alt="Perceptron Consultoria" class="footer-logo-img" />
                 </div>
                 <p class="footer-desc">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna.
+                    Consultoria especializada em regulação e infraestrutura. Apoio técnico e estratégico para serviços públicos, concessões e projetos de infraestrutura.
                 </p>
                 <div class="footer-social">
                     <div class="footer-social-btn" title="LinkedIn">
@@ -42,27 +42,35 @@ function renderFooter() {
             <div>
                 <div class="footer-col-title">Áreas de Atuação</div>
                 <div class="footer-links">
-                    <button class="footer-link">Lorem Ipsum Dolor</button>
-                    <button class="footer-link">Sit Amet Consectetur</button>
-                    <button class="footer-link">Adipiscing Elit Sed</button>
-                    <button class="footer-link">Eiusmod Tempor</button>
+                    <button class="footer-link">Gestão Pública</button>
+                    <button class="footer-link">Setor Elétrico</button>
+                    <button class="footer-link">Saneamento</button>
+                    <button class="footer-link">Rodovias & Ferrovias</button>
+                    <button class="footer-link">Concessões e PPPs</button>
+                    <button class="footer-link">Mineração</button>
                 </div>
             </div>
 
             <div>
-                <div class="footer-col-title">Escritório — Brasília/DF</div>
+                <div class="footer-col-title">Sede — Ribeirão Preto/SP</div>
                 <div class="footer-contact-list">
                     <div class="footer-contact-item">
                         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
                         </svg>
-                        SHIS QI 01, Conj. 08, Bloco D — DF
+                        Av. Dr. Plínio de Castro Prado, 288, Sala 23 — SP
+                    </div>
+                    <div class="footer-contact-item">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        SHI/S QI 7, BL B, SL 201 — Brasília/DF
                     </div>
                     <div class="footer-contact-item">
                         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.11 12 19.79 19.79 0 0 1 1 3.21a2 2 0 0 1 2-1.21h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                         </svg>
-                        +55 (61) 3300-4400
+                        +55 (61) 8180-2825
                     </div>
                     <div class="footer-contact-item">
                         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,7 +85,7 @@ function renderFooter() {
 
         <div class="footer-bottom">
             <span class="footer-copy">© ${new Date().getFullYear()} Perceptron Consultoria. Todos os direitos reservados.</span>
-            <span class="footer-copy">OAB/DF · CNPJ 00.000.000/0001-00</span>
+            <span class="footer-copy">Regulação & Infraestrutura · Ribeirão Preto/SP e Brasília/DF</span>
         </div>
     `;
 }

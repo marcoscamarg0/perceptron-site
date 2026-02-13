@@ -10,7 +10,7 @@ async function renderSobrePage() {
                     <span class="page-hero-label-text">Nossa história</span>
                 </div>
                 <h1 class="page-hero-title">Quem<br><em>Somos</em> Nós</h1>
-                <p class="page-hero-sub">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                <p class="page-hero-sub">Equipe multidisciplinar que integra regulação, gestão pública, direito e diferentes ramos da engenharia para construir soluções que funcionem na prática.</p>
             </div>
         </div>
 
@@ -18,16 +18,16 @@ async function renderSobrePage() {
             <div class="sobre-grid">
                 <div>
                     <p class="sobre-text-big">
-                        A <strong>Perceptron Consultoria</strong> lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim veniam.
+                        A <strong>Perceptron Consultoria</strong> é especializada em regulação e infraestrutura, com foco em apoio técnico e estratégico para planejar, regular, contratar, operar e melhorar serviços públicos e concessões.
                     </p>
                     <p class="sobre-text-body">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                        Nosso foco é sempre a excelência. Na Perceptron, a busca pela excelência orienta cada entrega, do diagnóstico à recomendação final. Atuamos com rigor técnico, clareza e compromisso com resultados, transformando complexidade em decisões seguras e aplicáveis no setor de infraestrutura.
                     </p>
                     <p class="sobre-text-body">
-                        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        Somos uma equipe multidisciplinar que integra regulação, gestão pública, direito e diferentes ramos da engenharia. Essa combinação amplia a capacidade de compreender o problema por inteiro, alinhar visão institucional e operacional, e construir soluções que funcionem na prática.
                     </p>
                     <p class="sobre-text-body">
-                        Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt neque porro quisquam.
+                        Atuamos com governança, previsibilidade e qualidade, sempre com entregas claras, auditáveis e aplicáveis. Apoiamos tanto órgãos públicos quanto empresas que atuam com o poder público, organizando materiais técnicos, planos de execução e rotinas de acompanhamento.
                     </p>
                 </div>
 
@@ -35,29 +35,29 @@ async function renderSobrePage() {
                     <div class="sobre-value-item">
                         <span class="sobre-value-num">01</span>
                         <div>
-                            <div class="sobre-value-title">Lorem Ipsum Dolor</div>
-                            <div class="sobre-value-desc">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa quae ab illo inventore veritatis.</div>
+                            <div class="sobre-value-title">Rigor Técnico</div>
+                            <div class="sobre-value-desc">Cada análise é fundamentada em premissas explícitas, metodologia clara e rastreabilidade de dados, garantindo credibilidade e confiança nas entregas.</div>
                         </div>
                     </div>
                     <div class="sobre-value-item">
                         <span class="sobre-value-num">02</span>
                         <div>
-                            <div class="sobre-value-title">Consectetur Adipiscing</div>
-                            <div class="sobre-value-desc">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</div>
+                            <div class="sobre-value-title">Clareza e Objetividade</div>
+                            <div class="sobre-value-desc">Transformamos complexidade regulatória e técnica em informação acessível, com recomendações objetivas prontas para subsidiar decisões.</div>
                         </div>
                     </div>
                     <div class="sobre-value-item">
                         <span class="sobre-value-num">03</span>
                         <div>
-                            <div class="sobre-value-title">Eiusmod Tempor</div>
-                            <div class="sobre-value-desc">Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur quis autem vel eum.</div>
+                            <div class="sobre-value-title">Visão Multidisciplinar</div>
+                            <div class="sobre-value-desc">A integração de regulação, direito, engenharia e gestão pública permite compreender o problema por inteiro e construir soluções mais robustas.</div>
                         </div>
                     </div>
                     <div class="sobre-value-item">
                         <span class="sobre-value-num">04</span>
                         <div>
-                            <div class="sobre-value-title">Magna Aliqua Veniam</div>
-                            <div class="sobre-value-desc">Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur vel illum qui dolorem eum fugiat quo voluptas nulla.</div>
+                            <div class="sobre-value-title">Compromisso com Resultados</div>
+                            <div class="sobre-value-desc">Atuamos com foco em previsibilidade e governança, garantindo que as entregas gerem impacto real e sejam aplicáveis no ciclo de vida dos contratos e projetos.</div>
                         </div>
                     </div>
                 </div>
@@ -66,14 +66,33 @@ async function renderSobrePage() {
             <div class="sobre-timeline">
                 <div class="section-label" style="margin-bottom:2.5rem">
                     <div class="section-label-line"></div>
-                    <span class="section-label-text">Nossa Trajetória</span>
+                    <span class="section-label-text">Nossos Escritórios</span>
                 </div>
                 <div class="timeline-grid">
-                    <div class="timeline-item"><div class="timeline-year">2009</div><div class="timeline-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.</div></div>
-                    <div class="timeline-item"><div class="timeline-year">2013</div><div class="timeline-desc">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.</div></div>
-                    <div class="timeline-item"><div class="timeline-year">2017</div><div class="timeline-desc">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore pariatur.</div></div>
-                    <div class="timeline-item"><div class="timeline-year">2021</div><div class="timeline-desc">Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt.</div></div>
-                    <div class="timeline-item"><div class="timeline-year">2025</div><div class="timeline-desc">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit sequi.</div></div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">Sede</div>
+                        <div class="timeline-desc">Ribeirão Preto — SP. Av. Dr. Plínio de Castro Prado, nº 288, Sala 23, Paulista Office, Jardim Palma Travassos. CEP: 14.091-170.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">Brasília</div>
+                        <div class="timeline-desc">Brasília — DF. SHI/S QI 7 Comércio Local, BL B, SL 201, Setor de Habitações Individuais. CEP: 71615-720.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">Contato</div>
+                        <div class="timeline-desc">+55 61 8180-2825. Atendimento presencial e remoto para todo o Brasil, com foco em setores regulados e infraestrutura pública.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sobre-timeline" style="margin-top:0">
+                <div class="section-label" style="margin-bottom:2.5rem">
+                    <div class="section-label-line"></div>
+                    <span class="section-label-text">Parceiros</span>
+                </div>
+                <div style="padding:2rem 0;">
+                    <p style="font-family:var(--font-body);font-size:1rem;color:var(--text-secondary);line-height:1.7;">
+                        <strong>Fundação Instituto de Administração (FIA)</strong> — parceiro estratégico da Perceptron Consultoria no desenvolvimento de soluções para gestão pública, regulação e infraestrutura.
+                    </p>
                 </div>
             </div>
 
@@ -84,7 +103,7 @@ async function renderSobrePage() {
                 </div>
                 <h2 class="section-title-serif" style="margin-top:.5rem;margin-bottom:.5rem">Nossa <em>Equipe</em></h2>
                 <p style="font-family:var(--font-body);font-size:.88rem;color:var(--text-muted);max-width:480px;line-height:1.7">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam.
+                    Especialistas com formação e experiência complementares em regulação, engenharia, gestão pública e direito, unidos pela busca da excelência técnica.
                 </p>
                 <div class="equipe-grid" id="equipeGrid"></div>
             </div>
@@ -103,13 +122,31 @@ function renderEquipeGrid() {
     AppState.equipe.forEach(m => {
         const card = document.createElement('div');
         card.className = `equipe-card ${AppState.isAdminMode ? 'admin-border' : ''}`;
+        const hasImg = m.imageUrl && m.imageUrl.trim() !== '';
+        
         card.innerHTML = `
             <div class="equipe-card-top">
-                <div class="equipe-avatar">
-                    <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                        <circle cx="12" cy="7" r="4"/>
-                    </svg>
+                <div class="equipe-avatar-wrap">
+                    ${hasImg
+                        ? `<img class="equipe-avatar-img" src="${m.imageUrl}" alt="${m.name}" />`
+                        : `<div class="equipe-avatar">
+                            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                           </div>`
+                    }
+                    ${AppState.isAdminMode ? `
+                    <div class="equipe-avatar-upload-overlay">
+                        <label class="upload-label">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            Trocar foto
+                            <input type="file" class="upload-input" accept="image/*" />
+                        </label>
+                    </div>` : ''}
                 </div>
             </div>
             <div class="equipe-card-body">
@@ -126,6 +163,23 @@ function renderEquipeGrid() {
                 </button>
             </div>
         `;
+        
+        // Upload de imagem
+        const fileInput = card.querySelector('.upload-input');
+        if (fileInput) {
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async (ev) => {
+                    await API.updateMembro(m.id, { ...m, imageUrl: ev.target.result });
+                    AppState.equipe = await API.getEquipe();
+                    renderEquipeGrid();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
         card.querySelector('.delete-btn')?.addEventListener('click', async () => {
             if (!AppState.isAdminMode) return;
             if (confirm(`Remover ${m.name}?`)) {

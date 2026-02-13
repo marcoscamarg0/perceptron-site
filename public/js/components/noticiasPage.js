@@ -10,7 +10,7 @@ async function renderNoticiasPage() {
                     <span class="page-hero-label-text">Publicações & Análises</span>
                 </div>
                 <h1 class="page-hero-title">Notícias &<br><em>Artigos</em></h1>
-                <p class="page-hero-sub">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                <p class="page-hero-sub">Análises, artigos e publicações técnicas sobre regulação, infraestrutura, gestão pública e concessões.</p>
             </div>
         </div>
 
@@ -197,7 +197,7 @@ function buildNewsModal({ title, data = {}, onSave }) {
                 </svg>
             </div>
             <h2 class="modal-title">${title}</h2>
-            <p class="modal-sub">Lorem ipsum dolor sit amet, consectetur adipiscing.</p>
+            <p class="modal-sub">Preencha os campos para publicar um novo conteúdo.</p>
             <div class="form-group">
                 <label class="form-label">Título</label>
                 <input class="form-input" id="nmTitle" value="${data.title||''}" placeholder="Lorem ipsum dolor sit amet..." />
