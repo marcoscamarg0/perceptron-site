@@ -7,7 +7,7 @@ function renderHeader() {
                 <img src="/logo.png" alt="Perceptron Consultoria" class="logo-img" />
             </div>
             <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
-                <div class="nav-toggle-lines" aria-hidden="true">
+                <div class="nav-burger" aria-hidden="true">
                     <span></span><span></span><span></span>
                 </div>
             </button>
