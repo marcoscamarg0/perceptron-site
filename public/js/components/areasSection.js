@@ -89,15 +89,15 @@ function renderAreasSection() {
                 <div class="areas-numbers-bar">
                     <div class="number-stat">
                         <div class="number-stat-value">17+</div>
-                        <div class="number-stat-label">Anos de Experiência</div>
+                        <div class="number-stat-label">Anos de Exp. dos Consultores</div>
                     </div>
                     <div class="number-stat">
                         <div class="number-stat-value">8</div>
                         <div class="number-stat-label">Áreas de Atuação</div>
                     </div>
                     <div class="number-stat">
-                        <div class="number-stat-value">4</div>
-                        <div class="number-stat-label">Especialistas</div>
+                        <div class="number-stat-value">5</div>
+                        <div class="number-stat-label">Consultores</div>
                     </div>
                     <div class="number-stat">
                         <div class="number-stat-value">2</div>

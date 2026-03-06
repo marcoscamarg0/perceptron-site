@@ -51,7 +51,7 @@ function renderHeroSection() {
                         <div class="hero-card hero-card-1">
                             <div class="hero-stat">
                                 <div class="hero-stat-num">17+</div>
-                                <div class="hero-stat-label">Anos de experiência</div>
+                                <div class="hero-stat-label">Anos de exp. dos consultores</div>
                             </div>
                             <div class="hero-divider"></div>
                             <div class="hero-stat">
