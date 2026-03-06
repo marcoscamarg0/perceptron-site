@@ -7,9 +7,15 @@ function renderHeader() {
                 <img src="/logo.png" alt="Perceptron Consultoria" class="logo-img" />
             </div>
             <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
-                <div class="nav-burger" aria-hidden="true">
-                    <span></span><span></span><span></span>
-                </div>
+                <svg class="burger-icon burger-open" width="18" height="14" viewBox="0 0 18 14" fill="none">
+                    <rect x="0" y="0"  width="18" height="2" rx="1" fill="white"/>
+                    <rect x="3" y="6"  width="15" height="2" rx="1" fill="white"/>
+                    <rect x="0" y="12" width="18" height="2" rx="1" fill="white"/>
+                </svg>
+                <svg class="burger-icon burger-close" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <line x1="1" y1="1" x2="15" y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="15" y1="1" x2="1"  y2="15" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                </svg>
             </button>
             <div class="nav-links">
                 <button class="nav-link active" data-page="home">Início</button>
