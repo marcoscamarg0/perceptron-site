@@ -594,7 +594,14 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
 
 @media(max-width:768px){
     .nav-links{ display:none; }
-    .nav-toggle{ display:inline-flex; }
+    .nav-toggle{
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        border-radius:10px !important;
+        width:40px !important;
+        height:40px !important;
+    }
     .logo-text{ display:none; }
     .logo-img{ height:34px; max-width:190px; }
     .section-header-row{ flex-direction:column; align-items:flex-start; }
