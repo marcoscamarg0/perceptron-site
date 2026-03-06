@@ -28,8 +28,8 @@
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { font-family: var(--font-body); background: var(--bg); color: var(--text); overflow-x: hidden; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--text); overflow-x: hidden; width: 100%; }
 img{max-width:100%; height:auto;}
 
 h1, h2, h3, h4 { font-family: var(--font-title); }
@@ -240,10 +240,11 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
 .hero-inner {
     position:relative; z-index:2;
     max-width:1400px; margin:0 auto;
-    padding:0 2.5rem; padding-top:72px;
+    padding:0 1.5rem; padding-top:72px;
     width:100%; display:grid;
     grid-template-columns:1fr 1fr;
     gap:4rem; align-items:center; min-height:100vh;
+    box-sizing: border-box;
 }
 
 .hero-eyebrow { display:flex; align-items:center; gap:1rem; margin-bottom:1.75rem; }
@@ -255,9 +256,11 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
 
 .hero-title {
     font-family:var(--font-title);
-    font-size:clamp(2.8rem,5.2vw,5.2rem);
+    font-size:clamp(2rem,5.2vw,5.2rem);
     font-weight:800; line-height:1.05; color:white; margin-bottom:1.5rem;
     text-transform:uppercase;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 .hero-title em    { font-style:italic; font-weight:400; color:rgba(255,255,255,.4); text-transform:none; display:block; font-size:.7em; margin-bottom:.2em; }
 .hero-title strong{ font-weight:900; display:block; }
@@ -267,7 +270,7 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
     color:rgba(255,255,255,.42); max-width:440px; margin-bottom:2.5rem;
 }
 
-.hero-actions { display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap; }
+.hero-actions { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
 
 .btn-primary {
     display:inline-flex; align-items:center; gap:.55rem;
@@ -572,8 +575,8 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
 .modal-hint { text-align:center; font-family:var(--font-aux); font-size:.58rem; font-weight:500; color:#b0b0b0; letter-spacing:.1em; margin-top:.9rem; text-transform:uppercase; }
 
 /* ── ADMIN FLOATING ──────────────────────────────── */
-.admin-floating { position:fixed; bottom:2rem; right:2rem; z-index:200; display:flex; flex-direction:column; align-items:flex-end; gap:.5rem; }
-.admin-btn { display:flex; align-items:center; gap:.55rem; padding:.72rem 1.2rem; border-radius:3px; border:none; font-family:var(--font-aux); font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,.18); transition:all .28s; }
+.admin-floating { position:fixed; bottom:1.25rem; right:1.25rem; z-index:200; display:flex; flex-direction:column; align-items:flex-end; gap:.5rem; }
+.admin-btn { display:flex; align-items:center; gap:.55rem; padding:.65rem 1rem; border-radius:3px; border:none; font-family:var(--font-aux); font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,.18); transition:all .28s; max-width:calc(100vw - 2.5rem); }
 .admin-btn:hover { transform:translateY(-2px); }
 .admin-btn-login  { background:var(--primary); color:white; }
 .admin-btn-logout { background:#dc2626; color:white; }
@@ -607,9 +610,10 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
 
 /* ── RESPONSIVE ──────────────────────────────────── */
 @media(max-width:1024px){
-    .hero-inner{ grid-template-columns:1fr; padding-top:120px; padding-bottom:80px; min-height:auto; }
+    .hero-inner{ grid-template-columns:1fr; padding-top:110px; padding-bottom:80px; min-height:auto; }
     .hero-visual{ display:none; }
 }
+
 @media(max-width:768px){
     .nav-links{ display:none; }
     .nav-toggle{ display:inline-flex; }
@@ -618,25 +622,47 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
     .section-header-row{ flex-direction:column; align-items:flex-start; }
     .section-desc{ text-align:left; }
     .noticias-toolbar{ flex-direction:column; align-items:flex-start; }
-    .contato-content,.sobre-content,.noticias-content{ padding:4rem 1.5rem; }
-    .section-container{ padding:0 1.5rem; }
+    .contato-content,.sobre-content,.noticias-content{ padding:4rem 1.25rem; }
+    .section-container{ padding:0 1.25rem; }
     .areas-section{ padding:5rem 0; }
-    .page-hero{ padding:8rem 1.5rem 4rem; }
-    .footer-inner,.footer-bottom{ padding-left:1.5rem; padding-right:1.5rem; }
+    .page-hero{ padding:8rem 1.25rem 4rem; }
+    .footer-inner,.footer-bottom{ padding-left:1.25rem; padding-right:1.25rem; }
     .equipe-card-top{ height:240px; }
     .sobre-grid{ gap:2.5rem; }
-    .areas-numbers-bar{ gap:1.5rem; }
+    .areas-numbers-bar{ gap:0; flex-wrap:wrap; padding:1.5rem 1rem; }
+    .number-stat{ min-width:45%; }
+    .number-stat + .number-stat::before{ display:none; }
+    /* Hero mobile */
+    .hero-inner{ padding-left:1.25rem; padding-right:1.25rem; }
+    .hero-title{ font-size:clamp(1.8rem,8vw,3rem); }
+    .hero-desc{ font-size:.9rem; max-width:100%; }
+    .hero-actions{ flex-direction:column; align-items:stretch; gap:.75rem; }
+    .btn-primary,.btn-outline{ justify-content:center; width:100%; }
+    .hero-badges{ gap:.75rem; }
+    /* Admin btn */
+    .admin-floating{ bottom:1rem; right:1rem; }
+    .admin-btn{ font-size:.6rem; padding:.6rem .85rem; }
 }
 
 @media(max-width:580px){
     .equipe-card-top{ height:300px; }
     .sobre-content{ padding:3rem 1.25rem; }
+    .hero-title{ font-size:clamp(1.6rem,7.5vw,2.4rem); }
+    .hero-eyebrow-text{ font-size:.58rem; letter-spacing:.15em; }
+    .areas-numbers-bar{ padding:1.25rem .75rem; }
+    .number-stat{ min-width:48%; padding:.75rem; }
+    .number-stat-value{ font-size:clamp(2rem,10vw,2.8rem); }
 }
 
 @media(max-width:420px){
     .header-inner{ padding:0 1rem; }
-    .logo-img{ max-width:160px; }
+    .logo-img{ max-width:150px; }
     .equipe-card-top{ height:260px; }
+    .hero-title{ font-size:clamp(1.5rem,7vw,2rem); }
+    .hero-inner{ padding-top:90px; padding-left:1rem; padding-right:1rem; }
+    .contato-content,.sobre-content,.noticias-content{ padding:3rem 1rem; }
+    .page-hero{ padding:7rem 1rem 3rem; }
+    .admin-btn span:not(:first-child){ display:none; }
 }
 
 /* ── THEME TOGGLE BUTTON ────────────────────────── */
