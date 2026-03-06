@@ -15,6 +15,7 @@ function renderHeader() {
                 <button class="nav-link active" data-page="home">Início</button>
                 <button class="nav-link" data-page="sobre">Empresa</button>
                 <button class="nav-link" data-page="noticias">Conteúdos</button>
+                <div class="nav-divider"></div>
                 <button class="nav-cta" data-page="contato">Contato</button>
                 <button class="theme-toggle" id="themeToggle" aria-label="Alternar modo escuro">
                     <span class="theme-icon theme-icon-sun">
