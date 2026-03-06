@@ -1,8 +1,7 @@
 const ThemeManager = {
     init() {
         const saved = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const isDark = saved ? saved === 'dark' : prefersDark;
+        const isDark = saved === 'dark'; // padrão sempre claro, a não ser que o usuário tenha escolhido escuro
         this.apply(isDark);
     },
     toggle() {
