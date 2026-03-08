@@ -54,6 +54,8 @@ let noticias = [
     }
 ];
 
+// Membros fixos — imagens embutidas no frontend (equipeImages.js)
+// Novos membros adicionados pelo admin salvam imageUrl no backend normalmente
 let equipe = [
     {
         id: '1',
@@ -61,7 +63,7 @@ let equipe = [
         role: 'Especialista em Regulação',
         bio: 'Graduado em Gestão Pública pelo IFB e graduando em Direito pelo UniCEUB. Pós-graduando em Direito e Regulação do Setor Elétrico. Experiência na ANEEL e ANM.',
         specialty: 'Regulação · Setor Elétrico · Mineração',
-        imageUrl: '/igor_opt.jpg'
+        imageKey: 'igor'
     },
     {
         id: '2',
@@ -69,7 +71,7 @@ let equipe = [
         role: 'Engenheiro Civil — Infraestrutura',
         bio: 'Engenheiro Civil pela USP. Consultor com mais de 15 anos de experiência em concessões rodoviárias e engenharia de infraestrutura, com atuação em implantação, conservação e gestão contratual.',
         specialty: 'Rodovias · Concessões · Infraestrutura',
-        imageUrl: '/rodrigo_opt.jpg'
+        imageKey: 'rodrigo'
     },
     {
         id: '3',
@@ -77,7 +79,7 @@ let equipe = [
         role: 'Engenheiro Mecânico — Gestão Pública',
         bio: 'Engenheiro Mecânico e Mestre pela UNIFEI. Experiência em gestão pública municipal, financeira, saúde e gestão territorial censitária.',
         specialty: 'Gestão Pública · Saneamento · Financeiro',
-        imageUrl: '/marcos_opt.jpg'
+        imageKey: 'marcos'
     },
     {
         id: '4',
@@ -85,7 +87,7 @@ let equipe = [
         role: 'Engenheiro Civil — Projetos',
         bio: 'Engenheiro Civil pela EESC-USP. Consultor com mais de 17 anos de experiência em análise de tráfego, coordenação de projetos executivos, estruturas e usinas hidrelétricas.',
         specialty: 'Projetos Executivos · Tráfego · Estruturas',
-        imageUrl: '/renato_opt.jpg'
+        imageKey: 'renato'
     },
     {
         id: '5',
@@ -93,7 +95,7 @@ let equipe = [
         role: 'Engenheira Eletricista — Setor Elétrico',
         bio: 'Engenheira Eletricista pela UnB. Pós-graduada em Gestão de Riscos na Comercialização de Energia pela USP. Experiência na ANEEL, CCEE e em consultorias especializadas no mercado de energia.',
         specialty: 'Regulação · Comercialização de Energia · Gestão de Riscos',
-        imageUrl: '/luisa_opt.jpg'
+        imageKey: 'luisa'
     }
 ];
 

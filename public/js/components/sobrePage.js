@@ -122,13 +122,16 @@ function renderEquipeGrid() {
     AppState.equipe.forEach(m => {
         const card = document.createElement('div');
         card.className = `equipe-card ${AppState.isAdminMode ? 'admin-border' : ''}`;
-        const hasImg = m.imageUrl && m.imageUrl.trim() !== '';
+        const imgSrc = m.imageKey
+            ? (typeof EQUIPE_IMAGES !== 'undefined' ? EQUIPE_IMAGES[m.imageKey] : '')
+            : (m.imageUrl || '');
+        const hasImg = imgSrc && imgSrc.trim() !== '';
         
         card.innerHTML = `
             <div class="equipe-card-top">
                 <div class="equipe-avatar-wrap">
                     ${hasImg
-                        ? `<img class="equipe-avatar-img" src="${m.imageUrl}" alt="${m.name}" />`
+                        ? `<img class="equipe-avatar-img" src="${imgSrc}" alt="${m.name}" />`
                         : `<div class="equipe-avatar">
                             <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
