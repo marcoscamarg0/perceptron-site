@@ -10,10 +10,12 @@ const EQUIPE_FIXA = [
 async function renderSobrePage() {
     const el = document.getElementById('sobrePage');
 
-    // Carrega membros fixos + eventuais extras adicionados pelo admin no backend
-    let extras = [];
-    try { extras = (await API.getEquipe()).filter(m => !['1','2','3','4','5'].includes(m.id)); } catch(e) {}
-    AppState.equipe = [...EQUIPE_FIXA, ...extras];
+    // Carrega edições salvas no localStorage e mescla com membros fixos
+    const saved = JSON.parse(localStorage.getItem('equipe_edits') || '{}');
+    AppState.equipe = EQUIPE_FIXA.map(m => ({ ...m, ...(saved[m.id] || {}) }));
+    // Extras adicionados pelo admin
+    const extras = JSON.parse(localStorage.getItem('equipe_extras') || '[]');
+    AppState.equipe = [...AppState.equipe, ...extras];
 
     el.innerHTML = `
         <div class="page-hero">
@@ -127,6 +129,16 @@ async function renderSobrePage() {
     document.addEventListener('authChanged', () => renderEquipeGrid());
 }
 
+function saveEquipeToStorage() {
+    // Salva edições dos membros fixos
+    const edits = {};
+    AppState.equipe.filter(m => ['1','2','3','4','5'].includes(m.id)).forEach(m => { edits[m.id] = m; });
+    localStorage.setItem('equipe_edits', JSON.stringify(edits));
+    // Salva membros extras
+    const extras = AppState.equipe.filter(m => !['1','2','3','4','5'].includes(m.id));
+    localStorage.setItem('equipe_extras', JSON.stringify(extras));
+}
+
 function renderEquipeGrid() {
     const grid = document.getElementById('equipeGrid');
     if (!grid) return;
@@ -194,6 +206,7 @@ function renderEquipeGrid() {
                     }
                     // Tenta salvar no backend também (melhor esforço)
                     API.updateMembro(m.id, { imageUrl: ev.target.result }).catch(() => {});
+                    saveEquipeToStorage();
                     renderEquipeGrid();
                 };
                 reader.readAsDataURL(file);
@@ -212,6 +225,7 @@ function renderEquipeGrid() {
             AppState.equipe[idx] = { ...AppState.equipe[idx], name, role, bio, specialty: spec };
             // Tenta salvar no backend (melhor esforço)
             API.updateMembro(m.id, { name, role, bio, specialty: spec }).catch(() => {});
+            saveEquipeToStorage();
             renderEquipeGrid();
         });
         
@@ -220,6 +234,7 @@ function renderEquipeGrid() {
             if (confirm(`Remover ${m.name}?`)) {
                 AppState.equipe = AppState.equipe.filter(x => x.id !== m.id);
                 API.deleteMembro(m.id).catch(() => {});
+                saveEquipeToStorage();
                 renderEquipeGrid();
             }
         });
@@ -242,8 +257,8 @@ function renderEquipeGrid() {
             const spec = prompt('Especialidade:') || '';
             const novo = { id: Date.now().toString(), name, role, bio, specialty: spec, imageUrl: '' };
             AppState.equipe.push(novo);
-            // Tenta salvar no backend (melhor esforço)
             API.createMembro({ name, role, bio, specialty: spec }).catch(() => {});
+            saveEquipeToStorage();
             renderEquipeGrid();
         });
         grid.appendChild(add);

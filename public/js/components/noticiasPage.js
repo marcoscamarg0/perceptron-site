@@ -10,10 +10,14 @@ const NOTICIAS_FIXAS = [
 async function renderNoticiasPage() {
     const el = document.getElementById('noticiasPage');
 
-    // Carrega notícias fixas + extras adicionadas pelo admin no backend
-    let extras = [];
-    try { extras = (await API.getNoticias()).filter(n => !['1','2','3','4','5'].includes(n.id)); } catch(e) {}
-    AppState.noticias = [...NOTICIAS_FIXAS, ...extras];
+    // Carrega edições salvas no localStorage
+    const savedEdits   = JSON.parse(localStorage.getItem('noticias_edits')  || '{}');
+    const savedExtras  = JSON.parse(localStorage.getItem('noticias_extras') || '[]');
+    const deletedIds   = JSON.parse(localStorage.getItem('noticias_deleted') || '[]');
+    AppState.noticias  = NOTICIAS_FIXAS
+        .filter(n => !deletedIds.includes(n.id))
+        .map(n => ({ ...n, ...(savedEdits[n.id] || {}) }));
+    AppState.noticias  = [...AppState.noticias, ...savedExtras];
 
     el.innerHTML = `
         <div class="page-hero">
@@ -159,6 +163,7 @@ function renderNoticiasGrid(tag = 'todos') {
                     const idx = AppState.noticias.findIndex(x => x.id === item.id);
                     if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], imageUrl: ev.target.result };
                     API.updateNoticia(item.id, { imageUrl: ev.target.result }).catch(() => {});
+                    saveNoticiasToStorage();
                     renderNoticiasGrid(document.querySelector('.filter-btn.active')?.dataset.tag || 'todos');
                 };
                 reader.readAsDataURL(f);
@@ -169,12 +174,29 @@ function renderNoticiasGrid(tag = 'todos') {
         card.querySelector('.delete-btn')?.addEventListener('click', () => {
             if (!AppState.isAdminMode || !confirm('Excluir esta publicação?')) return;
             AppState.noticias = AppState.noticias.filter(x => x.id !== item.id);
+            // Marca como deletada se for fixa
+            if (['1','2','3','4','5'].includes(item.id)) {
+                const del = JSON.parse(localStorage.getItem('noticias_deleted') || '[]');
+                del.push(item.id);
+                localStorage.setItem('noticias_deleted', JSON.stringify(del));
+            }
             API.deleteNoticia(item.id).catch(() => {});
+            saveNoticiasToStorage();
             renderNoticiasGrid(document.querySelector('.filter-btn.active')?.dataset.tag || 'todos');
         });
 
         grid.appendChild(card);
     });
+}
+
+function saveNoticiasToStorage() {
+    const edits = {};
+    AppState.noticias.filter(n => ['1','2','3','4','5'].includes(n.id)).forEach(n => { edits[n.id] = n; });
+    localStorage.setItem('noticias_edits', JSON.stringify(edits));
+    const extras = AppState.noticias.filter(n => !['1','2','3','4','5'].includes(n.id));
+    localStorage.setItem('noticias_extras', JSON.stringify(extras));
+    const deleted = JSON.parse(localStorage.getItem('noticias_deleted') || '[]');
+    localStorage.setItem('noticias_deleted', JSON.stringify(deleted));
 }
 
 function openAddNewsModal() {
@@ -183,6 +205,7 @@ function openAddNewsModal() {
             const nova = { id: Date.now().toString(), ...d, date: d.date || new Date().toLocaleDateString('pt-BR') };
             AppState.noticias = [nova, ...AppState.noticias];
             API.createNoticia(d).catch(() => {});
+            saveNoticiasToStorage();
             renderNoticiasGrid();
             ov.remove();
         }
@@ -196,6 +219,7 @@ function openEditNewsModal(item) {
             const idx = AppState.noticias.findIndex(x => x.id === item.id);
             if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], ...d };
             API.updateNoticia(item.id, d).catch(() => {});
+            saveNoticiasToStorage();
             renderNoticiasGrid();
             ov.remove();
         }
