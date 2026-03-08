@@ -180,27 +180,46 @@ function renderEquipeGrid() {
             </div>
         `;
         
-        // Upload de imagem
+        // Upload de imagem — salva localmente no AppState
         const fileInput = card.querySelector('.upload-input');
         if (fileInput) {
-            fileInput.addEventListener('change', async (e) => {
+            fileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
                 const reader = new FileReader();
-                reader.onload = async (ev) => {
-                    await API.updateMembro(m.id, { ...m, imageUrl: ev.target.result });
-                    AppState.equipe = await API.getEquipe();
+                reader.onload = (ev) => {
+                    const idx = AppState.equipe.findIndex(x => x.id === m.id);
+                    if (idx !== -1) {
+                        AppState.equipe[idx] = { ...AppState.equipe[idx], imageUrl: ev.target.result, imageKey: null };
+                    }
+                    // Tenta salvar no backend também (melhor esforço)
+                    API.updateMembro(m.id, { imageUrl: ev.target.result }).catch(() => {});
                     renderEquipeGrid();
                 };
                 reader.readAsDataURL(file);
             });
         }
+
+        // Editar campos ao clicar no card (modo admin)
+        card.querySelector('.equipe-card-body')?.addEventListener('click', () => {
+            if (!AppState.isAdminMode) return;
+            const idx = AppState.equipe.findIndex(x => x.id === m.id);
+            if (idx === -1) return;
+            const name = prompt('Nome:', m.name); if (name === null) return;
+            const role = prompt('Cargo:', m.role) ?? m.role;
+            const bio  = prompt('Bio:', m.bio)   ?? m.bio;
+            const spec = prompt('Especialidade:', m.specialty) ?? m.specialty;
+            AppState.equipe[idx] = { ...AppState.equipe[idx], name, role, bio, specialty: spec };
+            // Tenta salvar no backend (melhor esforço)
+            API.updateMembro(m.id, { name, role, bio, specialty: spec }).catch(() => {});
+            renderEquipeGrid();
+        });
         
         card.querySelector('.delete-btn')?.addEventListener('click', async () => {
             if (!AppState.isAdminMode) return;
             if (confirm(`Remover ${m.name}?`)) {
-                await API.deleteMembro(m.id);
-                AppState.equipe = await API.getEquipe();
+                AppState.equipe = AppState.equipe.filter(x => x.id !== m.id);
+                API.deleteMembro(m.id).catch(() => {});
                 renderEquipeGrid();
             }
         });
@@ -219,10 +238,13 @@ function renderEquipeGrid() {
         add.addEventListener('click', async () => {
             const name = prompt('Nome completo:'); if (!name) return;
             const role = prompt('Cargo:') || 'Consultor';
-            const bio  = prompt('Bio:')  || 'Lorem ipsum dolor sit amet.';
-            const spec = prompt('Especialidade:') || 'Lorem Ipsum';
-            const res  = await API.createMembro({ name, role, bio, specialty: spec });
-            if (res) { AppState.equipe = await API.getEquipe(); renderEquipeGrid(); }
+            const bio  = prompt('Bio:')  || '';
+            const spec = prompt('Especialidade:') || '';
+            const novo = { id: Date.now().toString(), name, role, bio, specialty: spec, imageUrl: '' };
+            AppState.equipe.push(novo);
+            // Tenta salvar no backend (melhor esforço)
+            API.createMembro({ name, role, bio, specialty: spec }).catch(() => {});
+            renderEquipeGrid();
         });
         grid.appendChild(add);
     }

@@ -149,15 +149,16 @@ function renderNoticiasGrid(tag = 'todos') {
             </div>
         `;
 
-        // upload imagem
+        // upload imagem — salva no estado local
         const fi = card.querySelector('.upload-input');
         if (fi) {
-            fi.addEventListener('change', async (e) => {
+            fi.addEventListener('change', (e) => {
                 const f = e.target.files[0]; if (!f) return;
                 const reader = new FileReader();
-                reader.onload = async (ev) => {
-                    await API.updateNoticia(item.id, { ...item, imageUrl: ev.target.result });
-                    AppState.noticias = await API.getNoticias();
+                reader.onload = (ev) => {
+                    const idx = AppState.noticias.findIndex(x => x.id === item.id);
+                    if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], imageUrl: ev.target.result };
+                    API.updateNoticia(item.id, { imageUrl: ev.target.result }).catch(() => {});
                     renderNoticiasGrid(document.querySelector('.filter-btn.active')?.dataset.tag || 'todos');
                 };
                 reader.readAsDataURL(f);
@@ -165,10 +166,10 @@ function renderNoticiasGrid(tag = 'todos') {
         }
 
         card.querySelector('.edit-btn')?.addEventListener('click', () => openEditNewsModal(item));
-        card.querySelector('.delete-btn')?.addEventListener('click', async () => {
+        card.querySelector('.delete-btn')?.addEventListener('click', () => {
             if (!AppState.isAdminMode || !confirm('Excluir esta publicação?')) return;
-            await API.deleteNoticia(item.id);
-            AppState.noticias = await API.getNoticias();
+            AppState.noticias = AppState.noticias.filter(x => x.id !== item.id);
+            API.deleteNoticia(item.id).catch(() => {});
             renderNoticiasGrid(document.querySelector('.filter-btn.active')?.dataset.tag || 'todos');
         });
 
@@ -178,9 +179,12 @@ function renderNoticiasGrid(tag = 'todos') {
 
 function openAddNewsModal() {
     const ov = buildNewsModal({ title: 'Nova Publicação',
-        onSave: async (d) => {
-            const r = await API.createNoticia(d);
-            if (r) { AppState.noticias = await API.getNoticias(); renderNoticiasGrid(); ov.remove(); }
+        onSave: (d) => {
+            const nova = { id: Date.now().toString(), ...d, date: d.date || new Date().toLocaleDateString('pt-BR') };
+            AppState.noticias = [nova, ...AppState.noticias];
+            API.createNoticia(d).catch(() => {});
+            renderNoticiasGrid();
+            ov.remove();
         }
     });
     document.body.appendChild(ov);
@@ -188,9 +192,12 @@ function openAddNewsModal() {
 
 function openEditNewsModal(item) {
     const ov = buildNewsModal({ title: 'Editar Publicação', data: item,
-        onSave: async (d) => {
-            const r = await API.updateNoticia(item.id, d);
-            if (r) { AppState.noticias = await API.getNoticias(); renderNoticiasGrid(); ov.remove(); }
+        onSave: (d) => {
+            const idx = AppState.noticias.findIndex(x => x.id === item.id);
+            if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], ...d };
+            API.updateNoticia(item.id, d).catch(() => {});
+            renderNoticiasGrid();
+            ov.remove();
         }
     });
     document.body.appendChild(ov);
@@ -223,11 +230,14 @@ function buildNewsModal({ title, data = {}, onSave }) {
                 <div class="form-group">
                     <label class="form-label">Categoria</label>
                     <select class="form-select" id="nmTag">
-                        <option value="Tecnologia"    ${data.tag==='Tecnologia'   ?'selected':''}>Tecnologia</option>
-                        <option value="LGPD"          ${data.tag==='LGPD'         ?'selected':''}>LGPD</option>
-                        <option value="IA"            ${data.tag==='IA'           ?'selected':''}>Inteligência Artificial</option>
-                        <option value="Institucional" ${data.tag==='Institucional'?'selected':''}>Institucional</option>
-                        <option value="Geral"         ${data.tag==='Geral'        ?'selected':''}>Geral</option>
+                        <option value="Saneamento"    ${data.tag==='Saneamento'   ?'selected':''}>Saneamento</option>
+                        <option value="Setor Elétrico" ${data.tag==='Setor Elétrico'?'selected':''}>Setor Elétrico</option>
+                        <option value="Rodovias"       ${data.tag==='Rodovias'     ?'selected':''}>Rodovias</option>
+                        <option value="Gestão Pública" ${data.tag==='Gestão Pública'?'selected':''}>Gestão Pública</option>
+                        <option value="Concessões"     ${data.tag==='Concessões'   ?'selected':''}>Concessões</option>
+                        <option value="Regulação"      ${data.tag==='Regulação'    ?'selected':''}>Regulação</option>
+                        <option value="Infraestrutura" ${data.tag==='Infraestrutura'?'selected':''}>Infraestrutura</option>
+                        <option value="Geral"          ${data.tag==='Geral'        ?'selected':''}>Geral</option>
                     </select>
                 </div>
                 <div class="form-group">
