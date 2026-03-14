@@ -10,12 +10,18 @@ const EQUIPE_FIXA = [
 async function renderSobrePage() {
     const el = document.getElementById('sobrePage');
 
-    // Carrega edições salvas no localStorage e mescla com membros fixos
-    const saved = JSON.parse(localStorage.getItem('equipe_edits') || '{}');
-    AppState.equipe = EQUIPE_FIXA.map(m => ({ ...m, ...(saved[m.id] || {}) }));
-    // Extras adicionados pelo admin
-    const extras = JSON.parse(localStorage.getItem('equipe_extras') || '[]');
-    AppState.equipe = [...AppState.equipe, ...extras];
+    // Carrega equipe do Firebase
+    try {
+        AppState.equipe = await FirebaseDB.getEquipe();
+        // Garante imageKey nos membros fixos
+        AppState.equipe = AppState.equipe.map(m => {
+            const fixo = EQUIPE_FIXA.find(f => f.id === m.id);
+            return fixo ? { ...fixo, ...m } : m;
+        });
+    } catch(e) {
+        console.warn('Firebase indisponível, usando dados fixos:', e);
+        AppState.equipe = [...EQUIPE_FIXA];
+    }
 
     el.innerHTML = `
         <div class="page-hero">
@@ -129,14 +135,8 @@ async function renderSobrePage() {
     document.addEventListener('authChanged', () => renderEquipeGrid());
 }
 
-function saveEquipeToStorage() {
-    // Salva edições dos membros fixos
-    const edits = {};
-    AppState.equipe.filter(m => ['1','2','3','4','5'].includes(m.id)).forEach(m => { edits[m.id] = m; });
-    localStorage.setItem('equipe_edits', JSON.stringify(edits));
-    // Salva membros extras
-    const extras = AppState.equipe.filter(m => !['1','2','3','4','5'].includes(m.id));
-    localStorage.setItem('equipe_extras', JSON.stringify(extras));
+async function saveEquipeToStorage() {
+    // Não precisa fazer nada — Firebase já salva em tempo real
 }
 
 function renderEquipeGrid() {
@@ -205,7 +205,8 @@ function renderEquipeGrid() {
                         AppState.equipe[idx] = { ...AppState.equipe[idx], imageUrl: ev.target.result, imageKey: null };
                     }
                     // Tenta salvar no backend também (melhor esforço)
-                    API.updateMembro(m.id, { imageUrl: ev.target.result }).catch(() => {});
+                    const updated = { ...AppState.equipe.find(x => x.id === m.id) };
+                    FirebaseDB.saveEquipeMembro(m.id, updated).catch(e => console.warn('Firebase:', e));
                     saveEquipeToStorage();
                     renderEquipeGrid();
                 };
@@ -224,7 +225,7 @@ function renderEquipeGrid() {
             const spec = prompt('Especialidade:', m.specialty) ?? m.specialty;
             AppState.equipe[idx] = { ...AppState.equipe[idx], name, role, bio, specialty: spec };
             // Tenta salvar no backend (melhor esforço)
-            API.updateMembro(m.id, { name, role, bio, specialty: spec }).catch(() => {});
+            FirebaseDB.saveEquipeMembro(m.id, AppState.equipe[idx]).catch(e => console.warn('Firebase:', e));
             saveEquipeToStorage();
             renderEquipeGrid();
         });
@@ -233,7 +234,7 @@ function renderEquipeGrid() {
             if (!AppState.isAdminMode) return;
             if (confirm(`Remover ${m.name}?`)) {
                 AppState.equipe = AppState.equipe.filter(x => x.id !== m.id);
-                API.deleteMembro(m.id).catch(() => {});
+                FirebaseDB.deleteEquipeMembro(m.id).catch(e => console.warn('Firebase:', e));
                 saveEquipeToStorage();
                 renderEquipeGrid();
             }
@@ -257,7 +258,7 @@ function renderEquipeGrid() {
             const spec = prompt('Especialidade:') || '';
             const novo = { id: Date.now().toString(), name, role, bio, specialty: spec, imageUrl: '' };
             AppState.equipe.push(novo);
-            API.createMembro({ name, role, bio, specialty: spec }).catch(() => {});
+            FirebaseDB.saveEquipeMembro(novo.id, novo).catch(e => console.warn('Firebase:', e));
             saveEquipeToStorage();
             renderEquipeGrid();
         });
