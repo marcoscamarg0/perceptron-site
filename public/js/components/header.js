@@ -131,6 +131,29 @@ const Navigation = {
             header.classList.remove('scrolled');
             const map = { sobre:'sobrePage', noticias:'noticiasPage', contato:'contatoPage' };
             if (map[page]) document.getElementById(map[page]).classList.remove('hidden');
+
+            // Recarrega dados do banco toda vez que navega para a página
+            if (page === 'noticias') {
+                API.getNoticias().then(dados => {
+                    if (dados && dados.length) {
+                        AppState.noticias = dados;
+                        renderNoticiasGrid();
+                    }
+                }).catch(() => {});
+            }
+            if (page === 'sobre') {
+                API.getEquipe().then(dados => {
+                    if (dados && dados.length) {
+                        AppState.equipe = dados.map(m => {
+                            const fixo = (typeof EQUIPE_FIXA !== 'undefined')
+                                ? EQUIPE_FIXA.find(f => f.id === m.id)
+                                : null;
+                            return fixo ? { ...fixo, ...m } : m;
+                        });
+                        renderEquipeGrid();
+                    }
+                }).catch(() => {});
+            }
         }
 
         window.scrollTo({ top:0, behavior:'smooth' });
