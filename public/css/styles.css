@@ -982,7 +982,7 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
     margin-bottom: 1.1rem;
 }
 .parceiro-logo {
-    height: 80px; width: auto; max-width: 220px;
+    height: auto; width: 100%; max-width: 200px;
     object-fit: contain; object-position: left center;
     margin-bottom: 1.1rem;
 }
