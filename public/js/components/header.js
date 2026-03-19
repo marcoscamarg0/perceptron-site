@@ -136,7 +136,7 @@ const Navigation = {
             if (page === 'noticias') {
                 API.getNoticias().then(dados => {
                     if (dados && dados.length) {
-                        AppState.noticias = dados;
+                        AppState.noticias = dados.sort((a, b) => (parseInt(b.id)||0) - (parseInt(a.id)||0));
                         const activeTag = document.querySelector('.filter-btn.active')?.dataset.tag || 'todos';
                         renderNoticiasGrid(activeTag);
                     }

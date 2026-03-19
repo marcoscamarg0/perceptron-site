@@ -14,7 +14,13 @@ async function renderNoticiasPage() {
     try {
         const dados = await API.getNoticias();
         if (dados && dados.length) {
-            AppState.noticias = dados;
+            // Ordena: mais recentes primeiro (id maior = mais recente)
+            AppState.noticias = dados.sort((a, b) => {
+                // Notícias com id numérico grande (timestamp) vêm primeiro
+                const aNum = parseInt(a.id) || 0;
+                const bNum = parseInt(b.id) || 0;
+                return bNum - aNum;
+            });
         } else {
             AppState.noticias = [...NOTICIAS_FIXAS];
         }
@@ -88,9 +94,15 @@ function renderNoticiasGrid(tag = 'todos') {
     if (!grid) return;
     grid.innerHTML = '';
 
+    // Ordena por mais recente (ids com timestamp maior = mais novos)
+    const sorted = [...AppState.noticias].sort((a, b) => {
+        const aNum = parseInt(a.id) || 0;
+        const bNum = parseInt(b.id) || 0;
+        return bNum - aNum;
+    });
     const lista = tag === 'todos'
-        ? AppState.noticias
-        : AppState.noticias.filter(n => n.tag === tag);
+        ? sorted
+        : sorted.filter(n => n.tag === tag);
 
     if (lista.length === 0) {
         grid.innerHTML = `
