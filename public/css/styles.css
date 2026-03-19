@@ -810,21 +810,24 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
 
 /* Cards hero no modo claro */
 :root:not(.dark) .hero-card-1 {
-    background: rgba(255,255,255,.75);
-    border-color: rgba(28,68,86,.12);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 4px 24px rgba(28,68,86,.1);
+    background: white;
+    border-color: rgba(28,68,86,.14);
+    backdrop-filter: none;
+    box-shadow: 0 8px 32px rgba(28,68,86,.12);
+    z-index: 2;
 }
 :root:not(.dark) .hero-card-2 {
-    background: rgba(240,246,250,.6);
-    border-color: rgba(46,132,175,.1);
+    background: rgba(228,238,244,.5);
+    border-color: rgba(28,68,86,.07);
+    z-index: 1;
 }
 :root:not(.dark) .hero-stat-num   { color: var(--primary); }
-:root:not(.dark) .hero-stat-label { color: rgba(28,68,86,.45); }
-:root:not(.dark) .hero-divider    { background: rgba(28,68,86,.08); }
+:root:not(.dark) .hero-stat-label { color: rgba(28,68,86,.5); }
+:root:not(.dark) .hero-divider    { background: rgba(28,68,86,.1); }
 :root:not(.dark) .hero-tag {
-    border-color: rgba(46,132,175,.25);
+    border-color: rgba(46,132,175,.3);
     color: var(--blue);
+    background: rgba(46,132,175,.06);
 }
 
 /* Botões hero no modo claro */
