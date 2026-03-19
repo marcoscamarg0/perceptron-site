@@ -201,10 +201,18 @@ function renderNoticiasGrid(tag = 'todos') {
 function saveNoticiasToStorage(noticia, isDelete) {
     // Salva no backend (MongoDB) — persiste em todos os dispositivos
     if (noticia && !isDelete) {
-        if (['1','2','3','4','5'].includes(noticia.id)) {
-            API.updateNoticia(noticia.id, noticia).catch(e => console.warn('API:', e));
+        // Verifica se já existe no AppState (edição) ou é nova
+        const jaExiste = AppState.noticias.some(n => n.id === noticia.id);
+        if (jaExiste && ['1','2','3','4','5'].includes(noticia.id)) {
+            API.updateNoticia(noticia.id, noticia).catch(e => console.warn('API update:', e));
+        } else if (jaExiste) {
+            // Notícia extra já existe no banco — atualiza
+            API.updateNoticia(noticia.id, noticia).catch(e => {
+                // Se não existir ainda, cria
+                API.createNoticia(noticia).catch(e2 => console.warn('API create:', e2));
+            });
         } else {
-            API.createNoticia(noticia).catch(e => console.warn('API:', e));
+            API.createNoticia(noticia).catch(e => console.warn('API create:', e));
         }
     }
     // Backup no localStorage

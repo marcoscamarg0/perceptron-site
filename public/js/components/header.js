@@ -137,9 +137,10 @@ const Navigation = {
                 API.getNoticias().then(dados => {
                     if (dados && dados.length) {
                         AppState.noticias = dados;
-                        renderNoticiasGrid();
+                        const activeTag = document.querySelector('.filter-btn.active')?.dataset.tag || 'todos';
+                        renderNoticiasGrid(activeTag);
                     }
-                }).catch(() => {});
+                }).catch(e => console.warn('Noticias API:', e));
             }
             if (page === 'sobre') {
                 API.getEquipe().then(dados => {
