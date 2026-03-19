@@ -110,14 +110,13 @@ async function renderSobrePage() {
                     <div class="section-label-line"></div>
                     <span class="section-label-text">Parceiros</span>
                 </div>
-                <div style="padding:1.5rem 0; display:flex; align-items:center; gap:2rem; flex-wrap:wrap;">
-                    <a href="https://fia.com.br" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:1.25rem;text-decoration:none;padding:1.25rem 1.75rem;border:1px solid rgba(28,68,86,.1);border-radius:12px;transition:all .25s;background:white;box-shadow:0 2px 8px rgba(28,68,86,.06);" onmouseover="this.style.boxShadow='0 6px 20px rgba(28,68,86,.12)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(28,68,86,.06)';this.style.transform='translateY(0)'">
-                        <img src="/fia_logo.png" alt="FIA Business School" style="height:48px;width:auto;object-fit:contain;" />
-                        <div>
-                            <div style="font-family:var(--font-aux);font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:3px;">Parceiro Estratégico</div>
-                            <div style="font-family:var(--font-title);font-size:.95rem;font-weight:700;color:var(--primary);">Fundação Instituto de Administração</div>
-                            <div style="font-family:var(--font-body);font-size:.78rem;color:var(--text-muted);margin-top:2px;">Gestão pública, regulação e infraestrutura</div>
-                        </div>
+                <div class="parceiros-grid">
+                    <a href="https://fia.com.br" target="_blank" rel="noopener" class="parceiro-card">
+                        <div class="parceiro-badge">Parceiro Estratégico</div>
+                        <img src="/fia_logo.png" alt="FIA Business School" class="parceiro-logo" />
+                        <div class="parceiro-divider"></div>
+                        <div class="parceiro-name">Fundação Instituto de Administração</div>
+                        <div class="parceiro-desc">Gestão pública · Regulação · Infraestrutura</div>
                     </a>
                 </div>
             </div>

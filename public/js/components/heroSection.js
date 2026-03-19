@@ -64,14 +64,7 @@ function renderHeroSection() {
                                 Projetos em andamento
                             </span>
                         </div>
-                        <div class="hero-card hero-card-2">
-                            <div class="hero-stat">
-                                <div class="hero-stat-num">100%</div>
-                                <div class="hero-stat-label">Foco em excelência</div>
-                            </div>
-                            <div class="hero-divider"></div>
-                            <div class="hero-tag">Regulação · Infraestrutura · Gestão Pública</div>
-                        </div>
+                        <div class="hero-card hero-card-2"></div>
                     </div>
                 </div>
             </div>
