@@ -29,7 +29,11 @@ let memEquipe = [
 
 async function connectDB() {
     const { MongoClient } = require('mongodb');
-    const client = new MongoClient(MONGO_URI);
+    const client = new MongoClient(MONGO_URI, {
+        tls: true,
+        serverSelectionTimeoutMS: 10000,
+        connectTimeoutMS: 10000,
+    });
     await client.connect();
     const db = client.db();
     colNoticias = db.collection('noticias');
