@@ -111,12 +111,12 @@ async function renderSobrePage() {
                     <span class="section-label-text">Parceiros</span>
                 </div>
                 <div style="padding:1.5rem 0; display:flex; align-items:center; gap:2rem; flex-wrap:wrap;">
-                    <a href="https://fia.com.br" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:1rem;text-decoration:none;padding:1rem 1.5rem;border:1px solid rgba(28,68,86,.1);border-radius:10px;transition:all .2s;background:white;" onmouseover="this.style.boxShadow='0 4px 16px rgba(28,68,86,.1)'" onmouseout="this.style.boxShadow='none'">
-                        <img src="https://fia.com.br/wp-content/uploads/2021/07/logo-fia.png" alt="FIA" style="height:40px;width:auto;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" />
-                        <span style="display:none;font-family:var(--font-title);font-size:1.1rem;font-weight:800;color:var(--primary);">FIA</span>
+                    <a href="https://fia.com.br" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:1.25rem;text-decoration:none;padding:1.25rem 1.75rem;border:1px solid rgba(28,68,86,.1);border-radius:12px;transition:all .25s;background:white;box-shadow:0 2px 8px rgba(28,68,86,.06);" onmouseover="this.style.boxShadow='0 6px 20px rgba(28,68,86,.12)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(28,68,86,.06)';this.style.transform='translateY(0)'">
+                        <img src="/fia_logo.png" alt="FIA Business School" style="height:48px;width:auto;object-fit:contain;" />
                         <div>
-                            <div style="font-family:var(--font-aux);font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);">Parceiro Estratégico</div>
-                            <div style="font-family:var(--font-body);font-size:.85rem;color:var(--text-muted);margin-top:2px;">Fundação Instituto de Administração</div>
+                            <div style="font-family:var(--font-aux);font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:3px;">Parceiro Estratégico</div>
+                            <div style="font-family:var(--font-title);font-size:.95rem;font-weight:700;color:var(--primary);">Fundação Instituto de Administração</div>
+                            <div style="font-family:var(--font-body);font-size:.78rem;color:var(--text-muted);margin-top:2px;">Gestão pública, regulação e infraestrutura</div>
                         </div>
                     </a>
                 </div>
