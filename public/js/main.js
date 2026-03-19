@@ -38,5 +38,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Checa autenticação salva
     Auth.checkAuth();
 
+    // Roteamento por URL
+    handleRoute();
+
     console.log('✅ Perceptron — pronto.');
 });
