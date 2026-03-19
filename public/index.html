@@ -24,47 +24,19 @@
     <div id="contatoPage" class="page hidden"></div>
     <footer class="footer" id="footer"></footer>
 
-    <!-- Scripts normais (não-module) -->
     <script src="js/equipeImages.js"></script>
     <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
-
-    <!-- Firebase (module) -->
-    <script type="module" src="js/firebase.js"></script>
-
-    <!-- App scripts — carregam após Firebase estar pronto -->
-    <script type="module">
-        // Aguarda Firebase inicializar e seed
-        async function init() {
-            // Espera window.FirebaseDB ficar disponível
-            while (!window.FirebaseDB) await new Promise(r => setTimeout(r, 50));
-            await window.FirebaseDB.seedIfEmpty();
-
-            // Carrega scripts do app em ordem
-            const scripts = [
-                'js/api.js',
-                'js/components/adminButton.js',
-                'js/components/loginModal.js',
-                'js/components/header.js',
-                'js/components/heroSection.js',
-                'js/components/areasSection.js',
-                'js/components/sobrePage.js',
-                'js/components/noticiasPage.js',
-                'js/components/contatoPage.js',
-                'js/components/footer.js',
-                'js/main.js'
-            ];
-            for (const src of scripts) {
-                await new Promise((resolve, reject) => {
-                    const s = document.createElement('script');
-                    s.src = src;
-                    s.onload = resolve;
-                    s.onerror = reject;
-                    document.body.appendChild(s);
-                });
-            }
-        }
-        init();
-    </script>
+    <script src="js/components/adminButton.js"></script>
+    <script src="js/components/loginModal.js"></script>
+    <script src="js/components/header.js"></script>
+    <script src="js/components/heroSection.js"></script>
+    <script src="js/components/areasSection.js"></script>
+    <script src="js/components/sobrePage.js"></script>
+    <script src="js/components/noticiasPage.js"></script>
+    <script src="js/components/contatoPage.js"></script>
+    <script src="js/components/footer.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
