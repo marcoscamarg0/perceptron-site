@@ -982,11 +982,9 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
     margin-bottom: 1.1rem;
 }
 .parceiro-logo {
-    height: 52px; width: auto; max-width: 180px;
+    height: 80px; width: auto; max-width: 220px;
     object-fit: contain; object-position: left center;
     margin-bottom: 1.1rem;
-    /* Escurecer logo no modo claro para boa leitura */
-    filter: brightness(0.15) saturate(0);
 }
 .parceiro-divider {
     width: 100%; height: 1px;
