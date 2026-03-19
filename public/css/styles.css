@@ -1009,3 +1009,31 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
 :root.dark .parceiro-logo {
     filter: brightness(1) saturate(0) invert(0);
 }
+
+/* ── EQUIPE ADMIN BAR ────────────────────────────── */
+.equipe-admin-bar {
+    display: flex;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+}
+.equipe-admin-edit,
+.equipe-admin-delete {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: .4rem;
+    padding: .75rem;
+    border: none; background: none; cursor: pointer;
+    font-family: var(--font-aux); font-size: .68rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    transition: all .18s;
+}
+.equipe-admin-edit {
+    color: var(--blue);
+    border-right: 1px solid var(--border);
+}
+.equipe-admin-edit:hover { background: rgba(46,132,175,.08); }
+.equipe-admin-delete {
+    color: #e05555;
+}
+.equipe-admin-delete:hover { background: rgba(224,85,85,.08); }
+:root.dark .equipe-admin-bar { border-top-color: var(--border); }
+:root.dark .equipe-admin-edit { border-right-color: var(--border); }

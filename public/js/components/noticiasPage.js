@@ -10,14 +10,14 @@ const NOTICIAS_FIXAS = [
 async function renderNoticiasPage() {
     const el = document.getElementById('noticiasPage');
 
-    // Carrega notícias do Firebase
-    try {
-        AppState.noticias = await FirebaseDB.getNoticias();
-        if (!AppState.noticias.length) AppState.noticias = [...NOTICIAS_FIXAS];
-    } catch(e) {
-        console.warn('Firebase indisponível, usando dados fixos:', e);
-        AppState.noticias = [...NOTICIAS_FIXAS];
-    }
+    // Carrega edições salvas no localStorage
+    const savedEdits   = JSON.parse(localStorage.getItem('noticias_edits')   || '{}');
+    const savedExtras  = JSON.parse(localStorage.getItem('noticias_extras')  || '[]');
+    const deletedIds   = JSON.parse(localStorage.getItem('noticias_deleted') || '[]');
+    AppState.noticias  = NOTICIAS_FIXAS
+        .filter(n => !deletedIds.includes(n.id))
+        .map(n => ({ ...n, ...(savedEdits[n.id] || {}) }));
+    AppState.noticias  = [...AppState.noticias, ...savedExtras];
 
     el.innerHTML = `
         <div class="page-hero">
@@ -183,8 +183,14 @@ function renderNoticiasGrid(tag = 'todos') {
     });
 }
 
-async function saveNoticiasToStorage() {
-    // Firebase salva em tempo real — não precisa fazer nada aqui
+function saveNoticiasToStorage() {
+    const edits = {};
+    AppState.noticias
+        .filter(n => ['1','2','3','4','5'].includes(n.id))
+        .forEach(n => { edits[n.id] = n; });
+    localStorage.setItem('noticias_edits', JSON.stringify(edits));
+    const extras = AppState.noticias.filter(n => !['1','2','3','4','5'].includes(n.id));
+    localStorage.setItem('noticias_extras', JSON.stringify(extras));
 }
 
 function openAddNewsModal() {

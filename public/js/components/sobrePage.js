@@ -10,18 +10,11 @@ const EQUIPE_FIXA = [
 async function renderSobrePage() {
     const el = document.getElementById('sobrePage');
 
-    // Carrega equipe do Firebase
-    try {
-        AppState.equipe = await FirebaseDB.getEquipe();
-        // Garante imageKey nos membros fixos
-        AppState.equipe = AppState.equipe.map(m => {
-            const fixo = EQUIPE_FIXA.find(f => f.id === m.id);
-            return fixo ? { ...fixo, ...m } : m;
-        });
-    } catch(e) {
-        console.warn('Firebase indisponível, usando dados fixos:', e);
-        AppState.equipe = [...EQUIPE_FIXA];
-    }
+    // Carrega edições salvas no localStorage e mescla com dados fixos
+    const savedEdits  = JSON.parse(localStorage.getItem('equipe_edits')  || '{}');
+    const savedExtras = JSON.parse(localStorage.getItem('equipe_extras') || '[]');
+    AppState.equipe = EQUIPE_FIXA.map(m => ({ ...m, ...(savedEdits[m.id] || {}) }));
+    AppState.equipe = [...AppState.equipe, ...savedExtras];
 
     el.innerHTML = `
         <div class="page-hero">
@@ -139,8 +132,16 @@ async function renderSobrePage() {
     document.addEventListener('authChanged', () => renderEquipeGrid());
 }
 
-async function saveEquipeToStorage() {
-    // Não precisa fazer nada — Firebase já salva em tempo real
+function saveEquipeToStorage() {
+    // Salva edições dos membros fixos (ids 1-5)
+    const edits = {};
+    AppState.equipe
+        .filter(m => ['1','2','3','4','5'].includes(m.id))
+        .forEach(m => { edits[m.id] = m; });
+    localStorage.setItem('equipe_edits', JSON.stringify(edits));
+    // Salva membros extras adicionados pelo admin
+    const extras = AppState.equipe.filter(m => !['1','2','3','4','5'].includes(m.id));
+    localStorage.setItem('equipe_extras', JSON.stringify(extras));
 }
 
 function renderEquipeGrid() {
@@ -168,8 +169,7 @@ function renderEquipeGrid() {
                             </svg>
                            </div>`
                     }
-                    ${AppState.isAdminMode ? `
-                    <div class="equipe-avatar-upload-overlay">
+                    <div class="equipe-avatar-upload-overlay" style="display:${AppState.isAdminMode ? 'flex' : 'none'}">
                         <label class="upload-label" onclick="event.stopPropagation()">
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -178,10 +178,10 @@ function renderEquipeGrid() {
                             Trocar foto
                             <input type="file" class="upload-input" accept="image/*" />
                         </label>
-                    </div>` : ''}
+                    </div>
                 </div>
             </div>
-            <div class="equipe-card-body" style="cursor:pointer">
+            <div class="equipe-card-body" style="cursor:${AppState.isAdminMode ? 'default' : 'pointer'}">
                 <div class="equipe-role">${m.role}</div>
                 <h3 class="equipe-name">${m.name}</h3>
                 <p class="equipe-bio">"${m.bio}"</p>
@@ -189,22 +189,24 @@ function renderEquipeGrid() {
                 ${!AppState.isAdminMode ? '<div class="equipe-ver-mais">Ver currículo →</div>' : ''}
             </div>
             ${AppState.isAdminMode ? `
-            <div class="card-admin-actions active">
-                <button class="action-btn edit-btn" data-id="${m.id}" title="Editar">
-                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="equipe-admin-bar">
+                <button class="equipe-admin-edit">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                     </svg>
+                    Editar
                 </button>
-                <button class="action-btn delete-btn" data-id="${m.id}" title="Remover">
-                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button class="equipe-admin-delete">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                     </svg>
+                    Remover
                 </button>
             </div>` : ''}
         `;
 
-        // Clique no card — abre currículo (modo normal) ou edita (modo admin)
+        // Clique no card — abre currículo apenas no modo normal
         const cardTop  = card.querySelector('.equipe-card-top');
         const cardBody = card.querySelector('.equipe-card-body');
         [cardTop, cardBody].forEach(el => {
@@ -225,7 +227,6 @@ function renderEquipeGrid() {
                 reader.onload = (ev) => {
                     const idx = AppState.equipe.findIndex(x => x.id === m.id);
                     if (idx !== -1) AppState.equipe[idx] = { ...AppState.equipe[idx], imageUrl: ev.target.result, imageKey: null };
-                    const updated = { ...AppState.equipe.find(x => x.id === m.id) };
                     saveEquipeToStorage();
                     renderEquipeGrid();
                 };
@@ -233,17 +234,15 @@ function renderEquipeGrid() {
             });
         }
 
-        // Editar (botão lápis)
-        card.querySelector('.edit-btn')?.addEventListener('click', (e) => {
+        // Editar
+        card.querySelector('.equipe-admin-edit')?.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (!AppState.isAdminMode) return;
             openEditMembroModal(m);
         });
 
         // Deletar
-        card.querySelector('.delete-btn')?.addEventListener('click', (e) => {
+        card.querySelector('.equipe-admin-delete')?.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (!AppState.isAdminMode) return;
             if (confirm(`Remover ${m.name}?`)) {
                 AppState.equipe = AppState.equipe.filter(x => x.id !== m.id);
                 saveEquipeToStorage();
