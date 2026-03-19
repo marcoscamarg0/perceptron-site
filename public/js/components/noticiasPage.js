@@ -188,9 +188,8 @@ function renderNoticiasGrid(tag = 'todos') {
         card.querySelector('.edit-btn')?.addEventListener('click', () => openEditNewsModal(item));
         card.querySelector('.delete-btn')?.addEventListener('click', () => {
             if (!AppState.isAdminMode || !confirm('Excluir esta publicação?')) return;
+            API.deleteNoticia(item.id).catch(e => console.warn('API delete:', e));
             AppState.noticias = AppState.noticias.filter(x => x.id !== item.id);
-            API.deleteNoticia(item.id).catch(e => console.warn('API:', e));
-            saveNoticiasToStorage(null, true);
             renderNoticiasGrid(document.querySelector('.filter-btn.active')?.dataset.tag || 'todos');
         });
 
@@ -226,10 +225,16 @@ function saveNoticiasToStorage(noticia, isDelete) {
 function openAddNewsModal() {
     let ov;
     ov = buildNewsModal({ title: 'Nova Publicação',
-        onSave: (d) => {
+        onSave: async (d) => {
             const nova = { id: Date.now().toString(), ...d, date: d.date || new Date().toLocaleDateString('pt-BR') };
+            // Salva no banco PRIMEIRO
+            try {
+                await API.createNoticia(nova);
+                console.log('✅ Notícia criada no banco');
+            } catch(e) {
+                console.warn('API createNoticia falhou:', e);
+            }
             AppState.noticias = [nova, ...AppState.noticias];
-            saveNoticiasToStorage(nova);
             if (ov) ov.remove();
             renderNoticiasGrid();
         }
@@ -240,10 +245,17 @@ function openAddNewsModal() {
 function openEditNewsModal(item) {
     let ov;
     ov = buildNewsModal({ title: 'Editar Publicação', data: item,
-        onSave: (d) => {
+        onSave: async (d) => {
+            const atualizado = { ...item, ...d };
+            // Salva no banco PRIMEIRO
+            try {
+                await API.updateNoticia(item.id, atualizado);
+                console.log('✅ Notícia atualizada no banco');
+            } catch(e) {
+                console.warn('API updateNoticia falhou:', e);
+            }
             const idx = AppState.noticias.findIndex(x => x.id === item.id);
-            if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], ...d };
-            saveNoticiasToStorage(idx !== -1 ? AppState.noticias[idx] : null);
+            if (idx !== -1) AppState.noticias[idx] = atualizado;
             if (ov) ov.remove();
             renderNoticiasGrid();
         }

@@ -337,15 +337,14 @@ function openEditorArtigo(item, onUpdated) {
             content:  textarea.value.trim(),
             slug:     slugify(title),
         };
+        // Salva no banco
+        API.updateNoticia(updated.id, updated).catch(e => {
+            // Se não existir, cria
+            API.createNoticia(updated).catch(e2 => console.warn('API:', e2));
+        });
         const idx = AppState.noticias.findIndex(x => x.id === item.id);
         if (idx !== -1) AppState.noticias[idx] = updated;
-        // Salva no backend
-        if (['1','2','3','4','5'].includes(updated.id)) {
-            API.updateNoticia(updated.id, updated).catch(e => console.warn('API:', e));
-        } else {
-            API.createNoticia(updated).catch(e => console.warn('API:', e));
-        }
-        saveNoticiasToStorage(updated);
+        else AppState.noticias.unshift(updated);
         ov.remove();
         if (typeof onUpdated === 'function') onUpdated(updated);
         else openArtigoPage(updated);
