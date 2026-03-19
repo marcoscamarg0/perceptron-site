@@ -783,6 +783,64 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
         radial-gradient(ellipse 50% 70% at 20% 80%, rgba(91,175,214,.06) 0%, transparent 50%),
         linear-gradient(155deg, #060e11 0%, #0f1e24 45%, #0d1a22 100%);
 }
+/* ── HERO: MODO CLARO ────────────────────────────── */
+:root:not(.dark) .hero {
+    background: #f4f6f8;
+}
+:root:not(.dark) .hero-bg {
+    background:
+        radial-gradient(ellipse 70% 60% at 75% 40%, rgba(28,68,86,.07) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 60% at 15% 80%, rgba(46,132,175,.05) 0%, transparent 55%),
+        linear-gradient(155deg, #e8eef2 0%, #f0f4f7 45%, #f5f7f9 100%);
+}
+:root:not(.dark) .hero-grid {
+    background-image:
+        linear-gradient(rgba(28,68,86,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(28,68,86,.04) 1px, transparent 1px);
+}
+:root:not(.dark) .hero-eyebrow-line { background: var(--primary); opacity:.5; }
+:root:not(.dark) .hero-eyebrow-text { color: var(--primary); opacity:.7; }
+:root:not(.dark) .hero-title        { color: var(--primary); }
+:root:not(.dark) .hero-title em     { color: var(--blue); -webkit-text-stroke: 0; opacity:.7; }
+:root:not(.dark) .hero-title strong { color: var(--primary); }
+:root:not(.dark) .hero-desc         { color: var(--text-muted); }
+:root:not(.dark) .hero-badge        { border-color: rgba(28,68,86,.15); color: var(--text-muted); }
+:root:not(.dark) .hero-scroll-text  { color: rgba(28,68,86,.35); }
+:root:not(.dark) .hero-scroll-line  { background: linear-gradient(to bottom, rgba(28,68,86,.4), transparent); }
+
+/* Cards hero no modo claro */
+:root:not(.dark) .hero-card-1 {
+    background: rgba(255,255,255,.75);
+    border-color: rgba(28,68,86,.12);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(28,68,86,.1);
+}
+:root:not(.dark) .hero-card-2 {
+    background: rgba(240,246,250,.6);
+    border-color: rgba(46,132,175,.1);
+}
+:root:not(.dark) .hero-stat-num   { color: var(--primary); }
+:root:not(.dark) .hero-stat-label { color: rgba(28,68,86,.45); }
+:root:not(.dark) .hero-divider    { background: rgba(28,68,86,.08); }
+:root:not(.dark) .hero-tag {
+    border-color: rgba(46,132,175,.25);
+    color: var(--blue);
+}
+
+/* Botões hero no modo claro */
+:root:not(.dark) .btn-primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 4px 16px rgba(28,68,86,.2);
+}
+:root:not(.dark) .btn-primary:hover { background: var(--blue); border-color: var(--blue); filter:none; }
+:root:not(.dark) .btn-outline {
+    border-color: rgba(28,68,86,.3);
+    color: var(--primary);
+}
+:root:not(.dark) .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: rgba(28,68,86,.05); }
+
 
 /* Dark: sections & cards */
 :root.dark .areas-section { background: var(--bg); }
