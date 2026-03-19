@@ -10,14 +10,14 @@ const NOTICIAS_FIXAS = [
 async function renderNoticiasPage() {
     const el = document.getElementById('noticiasPage');
 
-    // Carrega edições salvas no localStorage
-    const savedEdits   = JSON.parse(localStorage.getItem('noticias_edits')  || '{}');
-    const savedExtras  = JSON.parse(localStorage.getItem('noticias_extras') || '[]');
-    const deletedIds   = JSON.parse(localStorage.getItem('noticias_deleted') || '[]');
-    AppState.noticias  = NOTICIAS_FIXAS
-        .filter(n => !deletedIds.includes(n.id))
-        .map(n => ({ ...n, ...(savedEdits[n.id] || {}) }));
-    AppState.noticias  = [...AppState.noticias, ...savedExtras];
+    // Carrega notícias do Firebase
+    try {
+        AppState.noticias = await FirebaseDB.getNoticias();
+        if (!AppState.noticias.length) AppState.noticias = [...NOTICIAS_FIXAS];
+    } catch(e) {
+        console.warn('Firebase indisponível, usando dados fixos:', e);
+        AppState.noticias = [...NOTICIAS_FIXAS];
+    }
 
     el.innerHTML = `
         <div class="page-hero">
@@ -162,7 +162,7 @@ function renderNoticiasGrid(tag = 'todos') {
                 reader.onload = (ev) => {
                     const idx = AppState.noticias.findIndex(x => x.id === item.id);
                     if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], imageUrl: ev.target.result };
-                    API.updateNoticia(item.id, { imageUrl: ev.target.result }).catch(() => {});
+                    FirebaseDB.saveNoticia(item.id, AppState.noticias.find(x => x.id === item.id)).catch(e => console.warn('Firebase:', e));
                     saveNoticiasToStorage();
                     renderNoticiasGrid(document.querySelector('.filter-btn.active')?.dataset.tag || 'todos');
                 };
@@ -174,13 +174,7 @@ function renderNoticiasGrid(tag = 'todos') {
         card.querySelector('.delete-btn')?.addEventListener('click', () => {
             if (!AppState.isAdminMode || !confirm('Excluir esta publicação?')) return;
             AppState.noticias = AppState.noticias.filter(x => x.id !== item.id);
-            // Marca como deletada se for fixa
-            if (['1','2','3','4','5'].includes(item.id)) {
-                const del = JSON.parse(localStorage.getItem('noticias_deleted') || '[]');
-                del.push(item.id);
-                localStorage.setItem('noticias_deleted', JSON.stringify(del));
-            }
-            API.deleteNoticia(item.id).catch(() => {});
+            FirebaseDB.deleteNoticia(item.id).catch(e => console.warn('Firebase:', e));
             saveNoticiasToStorage();
             renderNoticiasGrid(document.querySelector('.filter-btn.active')?.dataset.tag || 'todos');
         });
@@ -189,14 +183,8 @@ function renderNoticiasGrid(tag = 'todos') {
     });
 }
 
-function saveNoticiasToStorage() {
-    const edits = {};
-    AppState.noticias.filter(n => ['1','2','3','4','5'].includes(n.id)).forEach(n => { edits[n.id] = n; });
-    localStorage.setItem('noticias_edits', JSON.stringify(edits));
-    const extras = AppState.noticias.filter(n => !['1','2','3','4','5'].includes(n.id));
-    localStorage.setItem('noticias_extras', JSON.stringify(extras));
-    const deleted = JSON.parse(localStorage.getItem('noticias_deleted') || '[]');
-    localStorage.setItem('noticias_deleted', JSON.stringify(deleted));
+async function saveNoticiasToStorage() {
+    // Firebase salva em tempo real — não precisa fazer nada aqui
 }
 
 function openAddNewsModal() {
@@ -204,7 +192,7 @@ function openAddNewsModal() {
         onSave: (d) => {
             const nova = { id: Date.now().toString(), ...d, date: d.date || new Date().toLocaleDateString('pt-BR') };
             AppState.noticias = [nova, ...AppState.noticias];
-            API.createNoticia(d).catch(() => {});
+            FirebaseDB.saveNoticia(nova.id, nova).catch(e => console.warn('Firebase:', e));
             saveNoticiasToStorage();
             renderNoticiasGrid();
             ov.remove();
@@ -218,7 +206,7 @@ function openEditNewsModal(item) {
         onSave: (d) => {
             const idx = AppState.noticias.findIndex(x => x.id === item.id);
             if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], ...d };
-            API.updateNoticia(item.id, d).catch(() => {});
+            FirebaseDB.saveNoticia(item.id, AppState.noticias[idx !== -1 ? idx : 0]).catch(e => console.warn('Firebase:', e));
             saveNoticiasToStorage();
             renderNoticiasGrid();
             ov.remove();

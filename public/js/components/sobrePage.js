@@ -10,12 +10,18 @@ const EQUIPE_FIXA = [
 async function renderSobrePage() {
     const el = document.getElementById('sobrePage');
 
-    // Carrega edições salvas no localStorage e mescla com membros fixos
-    const saved = JSON.parse(localStorage.getItem('equipe_edits') || '{}');
-    AppState.equipe = EQUIPE_FIXA.map(m => ({ ...m, ...(saved[m.id] || {}) }));
-    // Extras adicionados pelo admin
-    const extras = JSON.parse(localStorage.getItem('equipe_extras') || '[]');
-    AppState.equipe = [...AppState.equipe, ...extras];
+    // Carrega equipe do Firebase
+    try {
+        AppState.equipe = await FirebaseDB.getEquipe();
+        // Garante imageKey nos membros fixos
+        AppState.equipe = AppState.equipe.map(m => {
+            const fixo = EQUIPE_FIXA.find(f => f.id === m.id);
+            return fixo ? { ...fixo, ...m } : m;
+        });
+    } catch(e) {
+        console.warn('Firebase indisponível, usando dados fixos:', e);
+        AppState.equipe = [...EQUIPE_FIXA];
+    }
 
     el.innerHTML = `
         <div class="page-hero">
@@ -24,7 +30,7 @@ async function renderSobrePage() {
                     <div class="page-hero-label-line"></div>
                     <span class="page-hero-label-text">Nossa história</span>
                 </div>
-                <h1 class="page-hero-title">Quem<br><em>Somos</em> Nós</h1>
+                <h1 class="page-hero-title">Quem<br><em>Somos</em></h1>
                 <p class="page-hero-sub">Equipe multidisciplinar que integra regulação, gestão pública, direito e diferentes ramos da engenharia para construir soluções que funcionem na prática.</p>
             </div>
         </div>
@@ -104,10 +110,15 @@ async function renderSobrePage() {
                     <div class="section-label-line"></div>
                     <span class="section-label-text">Parceiros</span>
                 </div>
-                <div style="padding:2rem 0;">
-                    <p style="font-family:var(--font-body);font-size:1rem;color:var(--text-secondary);line-height:1.7;">
-                        <strong>Fundação Instituto de Administração (FIA)</strong> — parceiro estratégico da Perceptron Consultoria no desenvolvimento de soluções para gestão pública, regulação e infraestrutura.
-                    </p>
+                <div style="padding:1.5rem 0; display:flex; align-items:center; gap:2rem; flex-wrap:wrap;">
+                    <a href="https://fia.com.br" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:1rem;text-decoration:none;padding:1rem 1.5rem;border:1px solid rgba(28,68,86,.1);border-radius:10px;transition:all .2s;background:white;" onmouseover="this.style.boxShadow='0 4px 16px rgba(28,68,86,.1)'" onmouseout="this.style.boxShadow='none'">
+                        <img src="https://fia.com.br/wp-content/uploads/2021/07/logo-fia.png" alt="FIA" style="height:40px;width:auto;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" />
+                        <span style="display:none;font-family:var(--font-title);font-size:1.1rem;font-weight:800;color:var(--primary);">FIA</span>
+                        <div>
+                            <div style="font-family:var(--font-aux);font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);">Parceiro Estratégico</div>
+                            <div style="font-family:var(--font-body);font-size:.85rem;color:var(--text-muted);margin-top:2px;">Fundação Instituto de Administração</div>
+                        </div>
+                    </a>
                 </div>
             </div>
 
@@ -117,8 +128,8 @@ async function renderSobrePage() {
                     <span class="section-label-text">Time</span>
                 </div>
                 <h2 class="section-title-serif" style="margin-top:.5rem;margin-bottom:.5rem">Nossa <em>Equipe</em></h2>
-                <p style="font-family:var(--font-body);font-size:.88rem;color:var(--text-muted);max-width:480px;line-height:1.7">
-                    Especialistas com formação e experiência complementares em regulação, engenharia, gestão pública e direito, unidos pela busca da excelência técnica.
+                <p style="font-family:var(--font-body);font-size:.88rem;color:var(--text-muted);max-width:540px;line-height:1.7">
+                    Especialistas com formação e experiência complementares em regulação, engenharia, gestão pública e direito, unidos pela busca da excelência técnica. A Perceptron conta com outros consultores temporários para projetos específicos.
                 </p>
                 <div class="equipe-grid" id="equipeGrid"></div>
             </div>
@@ -129,14 +140,8 @@ async function renderSobrePage() {
     document.addEventListener('authChanged', () => renderEquipeGrid());
 }
 
-function saveEquipeToStorage() {
-    // Salva edições dos membros fixos
-    const edits = {};
-    AppState.equipe.filter(m => ['1','2','3','4','5'].includes(m.id)).forEach(m => { edits[m.id] = m; });
-    localStorage.setItem('equipe_edits', JSON.stringify(edits));
-    // Salva membros extras
-    const extras = AppState.equipe.filter(m => !['1','2','3','4','5'].includes(m.id));
-    localStorage.setItem('equipe_extras', JSON.stringify(extras));
+async function saveEquipeToStorage() {
+    // Não precisa fazer nada — Firebase já salva em tempo real
 }
 
 function renderEquipeGrid() {
@@ -151,9 +156,9 @@ function renderEquipeGrid() {
             ? (typeof EQUIPE_IMAGES !== 'undefined' ? EQUIPE_IMAGES[m.imageKey] : '')
             : (m.imageUrl || '');
         const hasImg = imgSrc && imgSrc.trim() !== '';
-        
+
         card.innerHTML = `
-            <div class="equipe-card-top">
+            <div class="equipe-card-top" style="cursor:pointer">
                 <div class="equipe-avatar-wrap">
                     ${hasImg
                         ? `<img class="equipe-avatar-img" src="${imgSrc}" alt="${m.name}" />`
@@ -166,7 +171,7 @@ function renderEquipeGrid() {
                     }
                     ${AppState.isAdminMode ? `
                     <div class="equipe-avatar-upload-overlay">
-                        <label class="upload-label">
+                        <label class="upload-label" onclick="event.stopPropagation()">
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                 <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
@@ -177,22 +182,40 @@ function renderEquipeGrid() {
                     </div>` : ''}
                 </div>
             </div>
-            <div class="equipe-card-body">
+            <div class="equipe-card-body" style="cursor:pointer">
                 <div class="equipe-role">${m.role}</div>
                 <h3 class="equipe-name">${m.name}</h3>
                 <p class="equipe-bio">"${m.bio}"</p>
                 <span class="equipe-specialty">${m.specialty}</span>
+                ${!AppState.isAdminMode ? '<div class="equipe-ver-mais">Ver currículo →</div>' : ''}
             </div>
             <div class="card-admin-actions ${AppState.isAdminMode ? 'active' : ''}">
-                <button class="action-btn delete-btn" data-id="${m.id}">
+                <button class="action-btn edit-btn" data-id="${m.id}" title="Editar">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                </button>
+                <button class="action-btn delete-btn" data-id="${m.id}" title="Remover">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                     </svg>
                 </button>
             </div>
         `;
-        
-        // Upload de imagem — salva localmente no AppState
+
+        // Clique no card — abre currículo (modo normal) ou edita (modo admin)
+        const cardTop  = card.querySelector('.equipe-card-top');
+        const cardBody = card.querySelector('.equipe-card-body');
+        [cardTop, cardBody].forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('.upload-label') || e.target.closest('.upload-input')) return;
+                if (AppState.isAdminMode) return;
+                openCurriculoModal(m, imgSrc);
+            });
+        });
+
+        // Upload de imagem
         const fileInput = card.querySelector('.upload-input');
         if (fileInput) {
             fileInput.addEventListener('change', (e) => {
@@ -201,11 +224,8 @@ function renderEquipeGrid() {
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     const idx = AppState.equipe.findIndex(x => x.id === m.id);
-                    if (idx !== -1) {
-                        AppState.equipe[idx] = { ...AppState.equipe[idx], imageUrl: ev.target.result, imageKey: null };
-                    }
-                    // Tenta salvar no backend também (melhor esforço)
-                    API.updateMembro(m.id, { imageUrl: ev.target.result }).catch(() => {});
+                    if (idx !== -1) AppState.equipe[idx] = { ...AppState.equipe[idx], imageUrl: ev.target.result, imageKey: null };
+                    const updated = { ...AppState.equipe.find(x => x.id === m.id) };
                     saveEquipeToStorage();
                     renderEquipeGrid();
                 };
@@ -213,31 +233,24 @@ function renderEquipeGrid() {
             });
         }
 
-        // Editar campos ao clicar no card (modo admin)
-        card.querySelector('.equipe-card-body')?.addEventListener('click', () => {
+        // Editar (botão lápis)
+        card.querySelector('.edit-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
             if (!AppState.isAdminMode) return;
-            const idx = AppState.equipe.findIndex(x => x.id === m.id);
-            if (idx === -1) return;
-            const name = prompt('Nome:', m.name); if (name === null) return;
-            const role = prompt('Cargo:', m.role) ?? m.role;
-            const bio  = prompt('Bio:', m.bio)   ?? m.bio;
-            const spec = prompt('Especialidade:', m.specialty) ?? m.specialty;
-            AppState.equipe[idx] = { ...AppState.equipe[idx], name, role, bio, specialty: spec };
-            // Tenta salvar no backend (melhor esforço)
-            API.updateMembro(m.id, { name, role, bio, specialty: spec }).catch(() => {});
-            saveEquipeToStorage();
-            renderEquipeGrid();
+            openEditMembroModal(m);
         });
-        
-        card.querySelector('.delete-btn')?.addEventListener('click', async () => {
+
+        // Deletar
+        card.querySelector('.delete-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
             if (!AppState.isAdminMode) return;
             if (confirm(`Remover ${m.name}?`)) {
                 AppState.equipe = AppState.equipe.filter(x => x.id !== m.id);
-                API.deleteMembro(m.id).catch(() => {});
                 saveEquipeToStorage();
                 renderEquipeGrid();
             }
         });
+
         grid.appendChild(card);
     });
 
@@ -245,22 +258,129 @@ function renderEquipeGrid() {
         const add = document.createElement('div');
         add.className = 'add-member-card';
         add.innerHTML = `
-            <svg width="34" height="34" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            <span style="font-family:var(--font-aux);font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase">Adicionar Membro</span>
+            <span style="font-family:var(--font-aux);font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase">Adicionar Consultor</span>
         `;
-        add.addEventListener('click', async () => {
-            const name = prompt('Nome completo:'); if (!name) return;
-            const role = prompt('Cargo:') || 'Consultor';
-            const bio  = prompt('Bio:')  || '';
-            const spec = prompt('Especialidade:') || '';
-            const novo = { id: Date.now().toString(), name, role, bio, specialty: spec, imageUrl: '' };
-            AppState.equipe.push(novo);
-            API.createMembro({ name, role, bio, specialty: spec }).catch(() => {});
-            saveEquipeToStorage();
-            renderEquipeGrid();
-        });
+        add.addEventListener('click', () => openAddMembroModal());
         grid.appendChild(add);
     }
+}
+
+// ── Modal currículo (clique no card, modo normal) ─────
+function openCurriculoModal(m, imgSrc) {
+    const hasImg = imgSrc && imgSrc.trim() !== '';
+    const ov = document.createElement('div');
+    ov.className = 'modal-overlay active';
+    ov.style.zIndex = '400';
+    ov.innerHTML = `
+        <div class="modal-box curriculo-modal" style="max-width:520px;padding:0;overflow:hidden;">
+            <button class="modal-x" id="cvClose" style="position:absolute;top:1rem;right:1rem;z-index:2">&times;</button>
+            <div class="curriculo-header">
+                ${hasImg ? `<img src="${imgSrc}" alt="${m.name}" class="curriculo-foto" />` : `<div class="curriculo-foto-placeholder"><svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>`}
+                <div class="curriculo-header-info">
+                    <div class="curriculo-role">${m.role}</div>
+                    <h2 class="curriculo-name">${m.name}</h2>
+                    <span class="equipe-specialty" style="margin-top:.5rem;display:inline-block">${m.specialty}</span>
+                </div>
+            </div>
+            <div class="curriculo-body">
+                <div class="curriculo-section-label">Sobre</div>
+                <p class="curriculo-bio">${m.bio}</p>
+                ${m.formacao ? `<div class="curriculo-section-label" style="margin-top:1.25rem">Formação</div><p class="curriculo-bio">${m.formacao}</p>` : ''}
+                ${m.experiencia ? `<div class="curriculo-section-label" style="margin-top:1.25rem">Experiência</div><p class="curriculo-bio">${m.experiencia}</p>` : ''}
+            </div>
+        </div>
+    `;
+    ov.querySelector('#cvClose').addEventListener('click', () => ov.remove());
+    ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+    document.body.appendChild(ov);
+}
+
+// ── Modal adicionar consultor ─────────────────────────
+function openAddMembroModal() {
+    openMembroModal({ title: 'Novo Consultor', data: {},
+        onSave: (d) => {
+            const novo = { id: Date.now().toString(), ...d };
+            AppState.equipe.push(novo);
+            saveEquipeToStorage();
+            renderEquipeGrid();
+        }
+    });
+}
+
+// ── Modal editar consultor ────────────────────────────
+function openEditMembroModal(m) {
+    openMembroModal({ title: 'Editar Consultor', data: m,
+        onSave: (d) => {
+            const idx = AppState.equipe.findIndex(x => x.id === m.id);
+            if (idx !== -1) AppState.equipe[idx] = { ...AppState.equipe[idx], ...d };
+            saveEquipeToStorage();
+            renderEquipeGrid();
+        }
+    });
+}
+
+// ── Builder do modal de consultor ────────────────────
+function openMembroModal({ title, data = {}, onSave }) {
+    const ov = document.createElement('div');
+    ov.className = 'modal-overlay active';
+    ov.style.zIndex = '400';
+    ov.innerHTML = `
+        <div class="modal-box" style="max-width:560px">
+            <button class="modal-x" id="mbClose">&times;</button>
+            <div class="modal-icon-wrap">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+            </div>
+            <h2 class="modal-title">${title}</h2>
+            <p class="modal-sub">Preencha os campos do consultor.</p>
+            <div class="form-group">
+                <label class="form-label">Nome completo</label>
+                <input class="form-input" id="mbName" value="${data.name||''}" placeholder="Nome Sobrenome" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Cargo</label>
+                <input class="form-input" id="mbRole" value="${data.role||''}" placeholder="Engenheiro Civil — Infraestrutura" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Especialidade</label>
+                <input class="form-input" id="mbSpec" value="${data.specialty||''}" placeholder="Área · Área · Área" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Bio / Resumo</label>
+                <textarea class="form-textarea" id="mbBio" style="min-height:80px" placeholder="Formação e experiência...">${data.bio||''}</textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Formação (opcional)</label>
+                <textarea class="form-textarea" id="mbFormacao" style="min-height:60px" placeholder="Graduação, pós-graduação...">${data.formacao||''}</textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Experiência (opcional)</label>
+                <textarea class="form-textarea" id="mbExp" style="min-height:60px" placeholder="Empresas, projetos, anos...">${data.experiencia||''}</textarea>
+            </div>
+            <button class="form-submit" id="mbSave">Salvar Consultor</button>
+        </div>
+    `;
+    ov.querySelector('#mbClose').addEventListener('click', () => ov.remove());
+    ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+    ov.querySelector('#mbSave').addEventListener('click', () => {
+        const name = ov.querySelector('#mbName').value.trim();
+        if (!name) return alert('Nome é obrigatório');
+        onSave({
+            name,
+            role:       ov.querySelector('#mbRole').value.trim() || 'Consultor',
+            specialty:  ov.querySelector('#mbSpec').value.trim(),
+            bio:        ov.querySelector('#mbBio').value.trim(),
+            formacao:   ov.querySelector('#mbFormacao').value.trim(),
+            experiencia:ov.querySelector('#mbExp').value.trim(),
+            imageUrl:   data.imageUrl || '',
+            imageKey:   data.imageKey || null,
+        });
+        ov.remove();
+    });
+    document.body.appendChild(ov);
 }
