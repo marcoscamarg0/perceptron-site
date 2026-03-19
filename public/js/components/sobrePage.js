@@ -10,11 +10,24 @@ const EQUIPE_FIXA = [
 async function renderSobrePage() {
     const el = document.getElementById('sobrePage');
 
-    // Carrega edições salvas no localStorage e mescla com dados fixos
-    const savedEdits  = JSON.parse(localStorage.getItem('equipe_edits')  || '{}');
-    const savedExtras = JSON.parse(localStorage.getItem('equipe_extras') || '[]');
-    AppState.equipe = EQUIPE_FIXA.map(m => ({ ...m, ...(savedEdits[m.id] || {}) }));
-    AppState.equipe = [...AppState.equipe, ...savedExtras];
+    // Carrega equipe do backend (MongoDB) — sincroniza entre todos os dispositivos
+    try {
+        const dados = await API.getEquipe();
+        if (dados && dados.length) {
+            AppState.equipe = dados.map(m => {
+                const fixo = EQUIPE_FIXA.find(f => f.id === m.id);
+                return fixo ? { ...fixo, ...m } : m;
+            });
+        } else {
+            AppState.equipe = [...EQUIPE_FIXA];
+        }
+    } catch(e) {
+        // Fallback para localStorage se API indisponível
+        const savedEdits  = JSON.parse(localStorage.getItem('equipe_edits')  || '{}');
+        const savedExtras = JSON.parse(localStorage.getItem('equipe_extras') || '[]');
+        AppState.equipe = EQUIPE_FIXA.map(m => ({ ...m, ...(savedEdits[m.id] || {}) }));
+        AppState.equipe = [...AppState.equipe, ...savedExtras];
+    }
 
     el.innerHTML = `
         <div class="page-hero">
@@ -132,14 +145,19 @@ async function renderSobrePage() {
     document.addEventListener('authChanged', () => renderEquipeGrid());
 }
 
-function saveEquipeToStorage() {
-    // Salva edições dos membros fixos (ids 1-5)
+function saveEquipeToStorage(membro) {
+    // Salva no backend (MongoDB) — persiste em todos os dispositivos
+    if (membro) {
+        if (['1','2','3','4','5'].includes(membro.id)) {
+            API.updateMembro(membro.id, membro).catch(e => console.warn('API:', e));
+        } else {
+            API.createMembro(membro).catch(e => console.warn('API:', e));
+        }
+    }
+    // Também salva no localStorage como backup
     const edits = {};
-    AppState.equipe
-        .filter(m => ['1','2','3','4','5'].includes(m.id))
-        .forEach(m => { edits[m.id] = m; });
+    AppState.equipe.filter(m => ['1','2','3','4','5'].includes(m.id)).forEach(m => { edits[m.id] = m; });
     localStorage.setItem('equipe_edits', JSON.stringify(edits));
-    // Salva membros extras adicionados pelo admin
     const extras = AppState.equipe.filter(m => !['1','2','3','4','5'].includes(m.id));
     localStorage.setItem('equipe_extras', JSON.stringify(extras));
 }
@@ -227,7 +245,7 @@ function renderEquipeGrid() {
                 reader.onload = (ev) => {
                     const idx = AppState.equipe.findIndex(x => x.id === m.id);
                     if (idx !== -1) AppState.equipe[idx] = { ...AppState.equipe[idx], imageUrl: ev.target.result, imageKey: null };
-                    saveEquipeToStorage();
+                    saveEquipeToStorage(AppState.equipe.find(x => x.id === m.id));
                     renderEquipeGrid();
                 };
                 reader.readAsDataURL(file);
@@ -244,7 +262,9 @@ function renderEquipeGrid() {
         card.querySelector('.equipe-admin-delete')?.addEventListener('click', (e) => {
             e.stopPropagation();
             if (confirm(`Remover ${m.name}?`)) {
+                const removido = AppState.equipe.find(x => x.id === m.id);
                 AppState.equipe = AppState.equipe.filter(x => x.id !== m.id);
+                if (removido) API.deleteMembro(removido.id).catch(e => console.warn('API:', e));
                 saveEquipeToStorage();
                 renderEquipeGrid();
             }
@@ -316,6 +336,7 @@ function openAddMembroModal() {
         onSave: (d) => {
             const novo = { id: Date.now().toString(), ...d };
             AppState.equipe.push(novo);
+            API.createMembro(novo).catch(e => console.warn('API:', e));
             saveEquipeToStorage();
             renderEquipeGrid();
         }

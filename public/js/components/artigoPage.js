@@ -339,7 +339,13 @@ function openEditorArtigo(item, onUpdated) {
         };
         const idx = AppState.noticias.findIndex(x => x.id === item.id);
         if (idx !== -1) AppState.noticias[idx] = updated;
-        saveNoticiasToStorage();
+        // Salva no backend
+        if (['1','2','3','4','5'].includes(updated.id)) {
+            API.updateNoticia(updated.id, updated).catch(e => console.warn('API:', e));
+        } else {
+            API.createNoticia(updated).catch(e => console.warn('API:', e));
+        }
+        saveNoticiasToStorage(updated);
         ov.remove();
         if (typeof onUpdated === 'function') onUpdated(updated);
         else openArtigoPage(updated);

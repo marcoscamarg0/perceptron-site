@@ -10,14 +10,24 @@ const NOTICIAS_FIXAS = [
 async function renderNoticiasPage() {
     const el = document.getElementById('noticiasPage');
 
-    // Carrega edições salvas no localStorage
-    const savedEdits   = JSON.parse(localStorage.getItem('noticias_edits')   || '{}');
-    const savedExtras  = JSON.parse(localStorage.getItem('noticias_extras')  || '[]');
-    const deletedIds   = JSON.parse(localStorage.getItem('noticias_deleted') || '[]');
-    AppState.noticias  = NOTICIAS_FIXAS
-        .filter(n => !deletedIds.includes(n.id))
-        .map(n => ({ ...n, ...(savedEdits[n.id] || {}) }));
-    AppState.noticias  = [...AppState.noticias, ...savedExtras];
+    // Carrega notícias do backend (MongoDB) — sincroniza entre todos os dispositivos
+    try {
+        const dados = await API.getNoticias();
+        if (dados && dados.length) {
+            AppState.noticias = dados;
+        } else {
+            AppState.noticias = [...NOTICIAS_FIXAS];
+        }
+    } catch(e) {
+        // Fallback para localStorage se API indisponível
+        const savedEdits   = JSON.parse(localStorage.getItem('noticias_edits')   || '{}');
+        const savedExtras  = JSON.parse(localStorage.getItem('noticias_extras')  || '[]');
+        const deletedIds   = JSON.parse(localStorage.getItem('noticias_deleted') || '[]');
+        AppState.noticias  = NOTICIAS_FIXAS
+            .filter(n => !deletedIds.includes(n.id))
+            .map(n => ({ ...n, ...(savedEdits[n.id] || {}) }));
+        AppState.noticias  = [...AppState.noticias, ...savedExtras];
+    }
 
     el.innerHTML = `
         <div class="page-hero">
@@ -179,7 +189,8 @@ function renderNoticiasGrid(tag = 'todos') {
         card.querySelector('.delete-btn')?.addEventListener('click', () => {
             if (!AppState.isAdminMode || !confirm('Excluir esta publicação?')) return;
             AppState.noticias = AppState.noticias.filter(x => x.id !== item.id);
-            saveNoticiasToStorage();
+            API.deleteNoticia(item.id).catch(e => console.warn('API:', e));
+            saveNoticiasToStorage(null, true);
             renderNoticiasGrid(document.querySelector('.filter-btn.active')?.dataset.tag || 'todos');
         });
 
@@ -187,11 +198,18 @@ function renderNoticiasGrid(tag = 'todos') {
     });
 }
 
-function saveNoticiasToStorage() {
+function saveNoticiasToStorage(noticia, isDelete) {
+    // Salva no backend (MongoDB) — persiste em todos os dispositivos
+    if (noticia && !isDelete) {
+        if (['1','2','3','4','5'].includes(noticia.id)) {
+            API.updateNoticia(noticia.id, noticia).catch(e => console.warn('API:', e));
+        } else {
+            API.createNoticia(noticia).catch(e => console.warn('API:', e));
+        }
+    }
+    // Backup no localStorage
     const edits = {};
-    AppState.noticias
-        .filter(n => ['1','2','3','4','5'].includes(n.id))
-        .forEach(n => { edits[n.id] = n; });
+    AppState.noticias.filter(n => ['1','2','3','4','5'].includes(n.id)).forEach(n => { edits[n.id] = n; });
     localStorage.setItem('noticias_edits', JSON.stringify(edits));
     const extras = AppState.noticias.filter(n => !['1','2','3','4','5'].includes(n.id));
     localStorage.setItem('noticias_extras', JSON.stringify(extras));
@@ -203,7 +221,7 @@ function openAddNewsModal() {
         onSave: (d) => {
             const nova = { id: Date.now().toString(), ...d, date: d.date || new Date().toLocaleDateString('pt-BR') };
             AppState.noticias = [nova, ...AppState.noticias];
-            saveNoticiasToStorage();
+            saveNoticiasToStorage(nova);
             if (ov) ov.remove();
             renderNoticiasGrid();
         }
@@ -217,7 +235,7 @@ function openEditNewsModal(item) {
         onSave: (d) => {
             const idx = AppState.noticias.findIndex(x => x.id === item.id);
             if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], ...d };
-            saveNoticiasToStorage();
+            saveNoticiasToStorage(idx !== -1 ? AppState.noticias[idx] : null);
             if (ov) ov.remove();
             renderNoticiasGrid();
         }
