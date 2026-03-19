@@ -35,10 +35,13 @@ async function renderNoticiasPage() {
             <div class="noticias-toolbar">
                 <div class="noticias-filters">
                     <button class="filter-btn active" data-tag="todos">Todos</button>
-                    <button class="filter-btn" data-tag="Tecnologia">Tecnologia</button>
-                    <button class="filter-btn" data-tag="LGPD">LGPD</button>
-                    <button class="filter-btn" data-tag="IA">Inteligência Artificial</button>
-                    <button class="filter-btn" data-tag="Institucional">Institucional</button>
+                    <button class="filter-btn" data-tag="Saneamento">Saneamento</button>
+                    <button class="filter-btn" data-tag="Setor Elétrico">Setor Elétrico</button>
+                    <button class="filter-btn" data-tag="Rodovias">Rodovias</button>
+                    <button class="filter-btn" data-tag="Gestão Pública">Gestão Pública</button>
+                    <button class="filter-btn" data-tag="Concessões">Concessões</button>
+                    <button class="filter-btn" data-tag="Regulação">Regulação</button>
+                    <button class="filter-btn" data-tag="Infraestrutura">Infraestrutura</button>
                 </div>
                 <button class="add-news-btn ${AppState.isAdminMode ? 'active' : ''}" id="addNewsBtn">
                     <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,66 +227,152 @@ function openEditNewsModal(item) {
 
 function buildNewsModal({ title, data = {}, onSave }) {
     const ov = document.createElement('div');
-    ov.className = 'modal-overlay active';
-    ov.style.zIndex = '400';
+    ov.className = 'modal-overlay active editor-overlay';
+    ov.style.cssText = 'z-index:500;align-items:flex-start;padding:0;overflow-y:auto;';
+
+    const TAGS = ['Saneamento','Setor Elétrico','Rodovias','Gestão Pública','Concessões','Regulação','Infraestrutura','Geral'];
+
     ov.innerHTML = `
-        <div class="modal-box" style="max-width:560px">
-            <button class="modal-x" id="nmClose">&times;</button>
-            <div class="modal-icon-wrap">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                </svg>
+        <div class="editor-box">
+            <div class="editor-toolbar">
+                <span class="editor-title-bar">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    ${title}
+                </span>
+                <div class="editor-actions">
+                    <button class="editor-btn-cancel" id="nmCancel">Cancelar</button>
+                    <button class="editor-btn-save" id="nmSave">Salvar e Publicar</button>
+                </div>
             </div>
-            <h2 class="modal-title">${title}</h2>
-            <p class="modal-sub">Preencha os campos para publicar um novo conteúdo.</p>
-            <div class="form-group">
-                <label class="form-label">Título</label>
-                <input class="form-input" id="nmTitle" value="${data.title||''}" placeholder="Lorem ipsum dolor sit amet..." />
-            </div>
-            <div class="form-group">
-                <label class="form-label">Resumo</label>
-                <textarea class="form-textarea" id="nmSummary" style="min-height:85px" placeholder="Consectetur adipiscing elit...">${data.summary||''}</textarea>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
+
+            <div class="editor-meta-row">
+                <div class="form-group" style="flex:2;min-width:200px">
+                    <label class="form-label">Título *</label>
+                    <input class="form-input" id="nmTitle" value="${data.title||''}" placeholder="Título do artigo" />
+                </div>
+                <div class="form-group" style="flex:1;min-width:150px">
                     <label class="form-label">Categoria</label>
                     <select class="form-select" id="nmTag">
-                        <option value="Saneamento"    ${data.tag==='Saneamento'   ?'selected':''}>Saneamento</option>
-                        <option value="Setor Elétrico" ${data.tag==='Setor Elétrico'?'selected':''}>Setor Elétrico</option>
-                        <option value="Rodovias"       ${data.tag==='Rodovias'     ?'selected':''}>Rodovias</option>
-                        <option value="Gestão Pública" ${data.tag==='Gestão Pública'?'selected':''}>Gestão Pública</option>
-                        <option value="Concessões"     ${data.tag==='Concessões'   ?'selected':''}>Concessões</option>
-                        <option value="Regulação"      ${data.tag==='Regulação'    ?'selected':''}>Regulação</option>
-                        <option value="Infraestrutura" ${data.tag==='Infraestrutura'?'selected':''}>Infraestrutura</option>
-                        <option value="Geral"          ${data.tag==='Geral'        ?'selected':''}>Geral</option>
+                        ${TAGS.map(t => `<option value="${t}" ${data.tag===t?'selected':''}>${t}</option>`).join('')}
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="flex:1;min-width:150px">
                     <label class="form-label">URL da Imagem</label>
                     <input class="form-input" id="nmImg" value="${data.imageUrl||''}" placeholder="https://..." />
                 </div>
             </div>
-            <div class="form-group">
-                <label class="form-label">Conteúdo completo do artigo</label>
-                <textarea class="form-textarea" id="nmContent" style="min-height:200px;font-family:monospace;font-size:.82rem" placeholder="Escreva aqui o artigo completo. Separe parágrafos com uma linha em branco.">${data.content||''}</textarea>
+
+            <div class="form-group" style="padding:0 2rem 1rem">
+                <label class="form-label">Resumo *</label>
+                <textarea class="form-textarea" id="nmSummary" style="min-height:65px">${data.summary||''}</textarea>
             </div>
-            <button class="form-submit" id="nmSave">Publicar</button>
+
+            <div class="editor-content-wrap">
+                <div class="editor-format-bar">
+                    <button class="efmt-btn" data-fmt="## ">H2</button>
+                    <button class="efmt-btn" data-fmt="### ">H3</button>
+                    <div class="efmt-sep"></div>
+                    <button class="efmt-btn" data-fmt="**" data-wrap="true"><strong>N</strong></button>
+                    <button class="efmt-btn efmt-italic" data-fmt="_" data-wrap="true"><em>I</em></button>
+                    <div class="efmt-sep"></div>
+                    <button class="efmt-btn" data-list="true">— Lista</button>
+                    <div class="efmt-sep"></div>
+                    <span class="efmt-hint">## Subtítulo &nbsp;|&nbsp; **negrito** &nbsp;|&nbsp; _itálico_ &nbsp;|&nbsp; Linha em branco = novo parágrafo</span>
+                </div>
+                <div class="editor-split">
+                    <textarea class="editor-textarea" id="nmContent" placeholder="Escreva o artigo completo aqui...
+
+## Subtítulo da seção
+
+Parágrafo normal. Use uma linha em branco para separar parágrafos.
+
+### Subtítulo menor
+
+- Item de lista
+- Outro item
+
+Use **negrito** e _itálico_ para destacar.">${data.content||''}</textarea>
+                    <div class="editor-split-preview">
+                        <div class="editor-preview-label">Pré-visualização</div>
+                        <div class="editor-preview" id="nmPreview"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     `;
-    ov.querySelector('#nmClose').addEventListener('click', () => ov.remove());
-    ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+
+    const textarea = ov.querySelector('#nmContent');
+    const preview  = ov.querySelector('#nmPreview');
+
+    function renderPreview() {
+        const text = textarea.value;
+        if (!text.trim()) {
+            preview.innerHTML = '<p style="color:var(--text-muted);font-style:italic;font-size:.85rem">A pré-visualização aparece aqui...</p>';
+            return;
+        }
+        const paras = text.split('\n\n').filter(p => p.trim());
+        preview.innerHTML = paras.map(p => {
+            if (p.startsWith('## '))  return '<h2 class="artigo-h2">'  + p.replace('## ','')  + '</h2>';
+            if (p.startsWith('### ')) return '<h3 class="artigo-h3">'  + p.replace('### ','') + '</h3>';
+            if (p.startsWith('- '))   return '<ul class="artigo-list">' + p.split('\n').filter(l=>l.startsWith('- ')).map(l=>'<li>'+l.slice(2)+'</li>').join('') + '</ul>';
+            return '<p class="artigo-paragrafo">' + p.replace(/\n/g,'<br>') + '</p>';
+        }).join('');
+    }
+
+    textarea.addEventListener('input', renderPreview);
+    renderPreview();
+
+    // Format buttons
+    ov.querySelectorAll('.efmt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const fmt  = btn.dataset.fmt;
+            const wrap = btn.dataset.wrap;
+            const list = btn.dataset.list;
+            const start = textarea.selectionStart;
+            const end   = textarea.selectionEnd;
+            const sel   = textarea.value.substring(start, end);
+            let val = textarea.value;
+            if (wrap && sel) {
+                val = val.substring(0,start) + fmt + sel + fmt + val.substring(end);
+            } else if (list) {
+                val = val.substring(0,start) + '- ' + val.substring(start);
+            } else {
+                const lineStart = val.lastIndexOf('\n', start-1) + 1;
+                val = val.substring(0,lineStart) + fmt + val.substring(lineStart);
+            }
+            textarea.value = val;
+            textarea.focus();
+            renderPreview();
+        });
+    });
+
+    ov.querySelector('#nmCancel').addEventListener('click', () => ov.remove());
+
     ov.querySelector('#nmSave').addEventListener('click', () => {
         const t = ov.querySelector('#nmTitle').value.trim();
         if (!t) return alert('Título é obrigatório');
+        const tag = ov.querySelector('#nmTag').value;
         onSave({
-            title: t,
-            summary: ov.querySelector('#nmSummary').value.trim(),
-            tag:      ov.querySelector('#nmTag').value,
+            title:    t,
+            summary:  ov.querySelector('#nmSummary').value.trim(),
+            tag,
             imageUrl: ov.querySelector('#nmImg').value.trim(),
-            content:  ov.querySelector('#nmContent').value.trim(),
-            date: data.date || new Date().toLocaleDateString('pt-BR')
+            content:  textarea.value.trim(),
+            date:     data.date || new Date().toLocaleDateString('pt-BR')
         });
+        // Após salvar, ativa o filtro da categoria
+        setTimeout(() => {
+            const filterBtn = document.querySelector(`.filter-btn[data-tag="${tag}"]`);
+            if (filterBtn) {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                filterBtn.classList.add('active');
+                renderNoticiasGrid(tag);
+            }
+        }, 100);
     });
+
     return ov;
 }
