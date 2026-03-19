@@ -7,7 +7,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "start": "node server/index.js",
+    "start": "node --tls-min-v1.2 server/index.js",
     "dev": "nodemon server/index.js"
   },
   "dependencies": {

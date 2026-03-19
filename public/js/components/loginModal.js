@@ -23,7 +23,6 @@ function renderLoginModal() {
                 </div>
                 <div class="modal-error" id="loginError">Chave inválida. Tente novamente.</div>
                 <button type="submit" class="modal-submit">Entrar no Modo Edição</button>
-                <p class="modal-hint">Dica: a senha é admin_perceptron</p>
             </form>
         </div>
     `;

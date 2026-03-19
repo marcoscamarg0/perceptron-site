@@ -1,17 +1,15 @@
-const express    = require('express');
-const cors       = require('cors');
-const path       = require('path');
+const express = require('express');
+const cors    = require('cors');
+const path    = require('path');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-
-// MongoDB é opcional — se não tiver MONGODB_URI, usa memória
 const MONGO_URI = process.env.MONGODB_URI || null;
 
 let colNoticias = null;
 let colEquipe   = null;
 
-// Dados em memória (fallback quando não há banco)
+// ── Dados em memória (fallback) ──────────────────────
 let memNoticias = [
     { id:'1', title:'Marco Legal do Saneamento: desafios e oportunidades para municípios', summary:'A Lei 14.026/2020 impõe novas exigências de universalização, equilíbrio tarifário e governança contratual.', date:'08/02/2025', tag:'Saneamento', imageUrl:'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80' },
     { id:'2', title:'Revisões tarifárias no setor elétrico: o papel da análise regulatória', summary:'Processos de revisão tarifária periódica exigem análise técnica robusta e monitoramento por indicadores.', date:'01/02/2025', tag:'Setor Elétrico', imageUrl:'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=900&q=80' },
@@ -20,31 +18,54 @@ let memNoticias = [
     { id:'5', title:'PPPs e concessões: do modelo ao contrato executável', summary:'A estruturação de PPPs e concessões envolve modelagem econômico-financeira, matriz de riscos e mecanismos de remuneração adequados.', date:'10/01/2025', tag:'Concessões', imageUrl:'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=900&q=80' }
 ];
 let memEquipe = [
-    { id:'1', name:'Igor Andrey Roselli',     role:'Especialista em Regulação',              bio:'Graduado em Gestão Pública pelo IFB e graduando em Direito pelo UniCEUB.', specialty:'Regulação · Setor Elétrico · Mineração', imageKey:'igor'    },
-    { id:'2', name:'Rodrigo Alex Roselli',    role:'Engenheiro Civil — Infraestrutura',       bio:'Engenheiro Civil pela USP. Consultor com mais de 15 anos de experiência.',  specialty:'Rodovias · Concessões · Infraestrutura', imageKey:'rodrigo' },
-    { id:'3', name:'Marcos Vinicius Roselli', role:'Engenheiro Mecânico — Gestão Pública',   bio:'Engenheiro Mecânico e Mestre pela UNIFEI.',                                  specialty:'Gestão Pública · Saneamento · Financeiro', imageKey:'marcos'  },
-    { id:'4', name:'Renato Henrique Roselli', role:'Engenheiro Civil — Projetos',            bio:'Engenheiro Civil pela EESC-USP. Consultor com mais de 17 anos de experiência.', specialty:'Projetos Executivos · Tráfego · Estruturas', imageKey:'renato' },
-    { id:'5', name:'Luísa Simei',             role:'Engenheira Eletricista — Setor Elétrico', bio:'Engenheira Eletricista pela UnB. Pós-graduada pela USP.',                   specialty:'Regulação · Comercialização de Energia · Gestão de Riscos', imageKey:'luisa' }
+    { id:'1', name:'Igor Andrey Roselli',     role:'Especialista em Regulação',               bio:'Graduado em Gestão Pública pelo IFB e graduando em Direito pelo UniCEUB. Pós-graduando em Direito e Regulação do Setor Elétrico. Experiência na ANEEL e ANM.',                                                                                            specialty:'Regulação · Setor Elétrico · Mineração',               imageKey:'igor'    },
+    { id:'2', name:'Rodrigo Alex Roselli',    role:'Engenheiro Civil — Infraestrutura',        bio:'Engenheiro Civil pela USP. Consultor com mais de 15 anos de experiência em concessões rodoviárias e engenharia de infraestrutura.',                                                                                                                          specialty:'Rodovias · Concessões · Infraestrutura',                imageKey:'rodrigo' },
+    { id:'3', name:'Marcos Vinicius Roselli', role:'Engenheiro Mecânico — Gestão Pública',     bio:'Engenheiro Mecânico e Mestre pela UNIFEI. Experiência em gestão pública municipal, financeira, saúde e gestão territorial censitária.',                                                                                                                       specialty:'Gestão Pública · Saneamento · Financeiro',              imageKey:'marcos'  },
+    { id:'4', name:'Renato Henrique Roselli', role:'Engenheiro Civil — Projetos',              bio:'Engenheiro Civil pela EESC-USP. Consultor com mais de 17 anos de experiência em análise de tráfego e coordenação de projetos executivos.',                                                                                                                    specialty:'Projetos Executivos · Tráfego · Estruturas',            imageKey:'renato'  },
+    { id:'5', name:'Luísa Simei',             role:'Engenheira Eletricista — Setor Elétrico',  bio:'Engenheira Eletricista pela UnB. Pós-graduada em Gestão de Riscos na Comercialização de Energia pela USP. Experiência na ANEEL e CCEE.',                                                                                                                    specialty:'Regulação · Comercialização de Energia · Gestão de Riscos', imageKey:'luisa' }
 ];
 
+// ── Conexão MongoDB ──────────────────────────────────
 async function connectDB() {
     const { MongoClient } = require('mongodb');
-    const client = new MongoClient(MONGO_URI, {
-        tls: true,
-        serverSelectionTimeoutMS: 10000,
-        connectTimeoutMS: 10000,
-    });
-    await client.connect();
-    const db = client.db();
-    colNoticias = db.collection('noticias');
-    colEquipe   = db.collection('equipe');
-    console.log('✅ MongoDB conectado');
-    // Seed se vazio
+
+    // Tenta conexão com diferentes configurações SSL
+    const configs = [
+        { tls: true, tlsAllowInvalidCertificates: false },
+        { tls: true, tlsAllowInvalidCertificates: true  },
+        { ssl: true  },
+        {}
+    ];
+
+    for (const opts of configs) {
+        try {
+            const client = new MongoClient(MONGO_URI, {
+                ...opts,
+                serverSelectionTimeoutMS: 8000,
+                connectTimeoutMS: 8000,
+            });
+            await client.connect();
+            const db = client.db();
+            colNoticias = db.collection('noticias');
+            colEquipe   = db.collection('equipe');
+            console.log('✅ MongoDB conectado com opções:', JSON.stringify(opts));
+            await seedDB();
+            return;
+        } catch (err) {
+            console.warn('Tentativa falhou:', JSON.stringify(opts), '-', err.message.substring(0, 80));
+        }
+    }
+    throw new Error('Todas as tentativas de conexão falharam');
+}
+
+async function seedDB() {
     if (await colNoticias.countDocuments() === 0) {
         await colNoticias.insertMany(memNoticias.map(n => ({ _id: n.id, ...n })));
+        console.log('✅ Notícias seed inseridas');
     }
     if (await colEquipe.countDocuments() === 0) {
         await colEquipe.insertMany(memEquipe.map(m => ({ _id: m.id, ...m })));
+        console.log('✅ Equipe seed inserida');
     }
 }
 
@@ -53,6 +74,7 @@ function fmt(doc) {
     return { id: String(_id), ...rest };
 }
 
+// ── Middleware ───────────────────────────────────────
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
@@ -71,20 +93,16 @@ app.get('/api/noticias/:id', async (req, res) => {
     return item ? res.json(item) : res.status(404).json({ error: 'Não encontrado' });
 });
 app.post('/api/noticias', async (req, res) => {
-    const { title, summary, tag, imageUrl } = req.body;
+    const { title, summary, tag, imageUrl, content, slug } = req.body;
     if (!title) return res.status(400).json({ error: 'Título obrigatório' });
-    const nova = { id: Date.now().toString(), title, summary: summary||'', date: new Date().toLocaleDateString('pt-BR'), tag: tag||'Geral', imageUrl: imageUrl||'' };
+    const nova = { id: Date.now().toString(), title, summary: summary||'', date: new Date().toLocaleDateString('pt-BR'), tag: tag||'Geral', imageUrl: imageUrl||'', content: content||'', slug: slug||'' };
     if (colNoticias) await colNoticias.insertOne({ _id: nova.id, ...nova });
     else memNoticias = [nova, ...memNoticias];
     res.status(201).json(nova);
 });
 app.put('/api/noticias/:id', async (req, res) => {
-    const { title, summary, tag, imageUrl } = req.body;
     const upd = {};
-    if (title    !== undefined) upd.title    = title;
-    if (summary  !== undefined) upd.summary  = summary;
-    if (tag      !== undefined) upd.tag      = tag;
-    if (imageUrl !== undefined) upd.imageUrl = imageUrl;
+    ['title','summary','tag','imageUrl','content','slug'].forEach(k => { if (req.body[k] !== undefined) upd[k] = req.body[k]; });
     if (colNoticias) {
         const r = await colNoticias.findOneAndUpdate({ _id: req.params.id }, { $set: upd }, { returnDocument:'after' });
         return r ? res.json(fmt(r)) : res.status(404).json({ error: 'Não encontrado' });
@@ -110,21 +128,16 @@ app.get('/api/equipe', async (req, res) => {
     res.json(memEquipe);
 });
 app.post('/api/equipe', async (req, res) => {
-    const { name, role, bio, specialty, imageUrl } = req.body;
+    const { name, role, bio, specialty, imageUrl, formacao, experiencia, publicacoes, idiomas, linkedin } = req.body;
     if (!name) return res.status(400).json({ error: 'Nome obrigatório' });
-    const novo = { id: Date.now().toString(), name, role: role||'Consultor', bio: bio||'', specialty: specialty||'', imageUrl: imageUrl||'' };
+    const novo = { id: Date.now().toString(), name, role: role||'Consultor', bio: bio||'', specialty: specialty||'', imageUrl: imageUrl||'', formacao: formacao||'', experiencia: experiencia||'', publicacoes: publicacoes||'', idiomas: idiomas||'', linkedin: linkedin||'' };
     if (colEquipe) await colEquipe.insertOne({ _id: novo.id, ...novo });
     else memEquipe = [...memEquipe, novo];
     res.status(201).json(novo);
 });
 app.put('/api/equipe/:id', async (req, res) => {
-    const { name, role, bio, specialty, imageUrl } = req.body;
     const upd = {};
-    if (name      !== undefined) upd.name      = name;
-    if (role      !== undefined) upd.role      = role;
-    if (bio       !== undefined) upd.bio       = bio;
-    if (specialty !== undefined) upd.specialty = specialty;
-    if (imageUrl  !== undefined) upd.imageUrl  = imageUrl;
+    ['name','role','bio','specialty','imageUrl','imageKey','formacao','experiencia','publicacoes','idiomas','linkedin'].forEach(k => { if (req.body[k] !== undefined) upd[k] = req.body[k]; });
     if (colEquipe) {
         const r = await colEquipe.findOneAndUpdate({ _id: req.params.id }, { $set: upd }, { returnDocument:'after' });
         return r ? res.json(fmt(r)) : res.status(404).json({ error: 'Não encontrado' });
@@ -144,32 +157,23 @@ app.delete('/api/equipe/:id', async (req, res) => {
     res.status(204).send();
 });
 
-// Rotas de artigos e páginas — servem index.html (SPA)
-app.get('/artigo/*', (req, res) =>
-    res.sendFile(path.join(__dirname, '../public/index.html'))
-);
-app.get('/noticias', (req, res) =>
-    res.sendFile(path.join(__dirname, '../public/index.html'))
-);
-app.get('*', (req, res) =>
-    res.sendFile(path.join(__dirname, '../public/index.html'))
-);
+// ── Rotas SPA ─────────────────────────────────────────
+app.get('/artigo/*', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+app.get('/noticias',  (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+app.get('*',          (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
 
-// ── START ─────────────────────────────────────────────
-async function startServer() {
+// ── Start ─────────────────────────────────────────────
+async function start() {
     if (MONGO_URI) {
         try {
             await connectDB();
-        } catch(err) {
-            console.warn('⚠️  MongoDB falhou, usando memória:', err.message);
+        } catch (err) {
+            console.error('❌ MongoDB não conectou, usando memória:', err.message);
         }
     } else {
-        console.log('ℹ️  Sem MONGODB_URI — usando memória (dados resetam ao reiniciar)');
+        console.log('ℹ️  Sem MONGODB_URI — usando memória');
     }
-    if (!process.env.VERCEL) {
-        app.listen(PORT, () => console.log(`🚀 http://localhost:${PORT}`));
-    }
+    app.listen(PORT, () => console.log('🚀 http://localhost:' + PORT));
 }
 
-startServer();
-if (process.env.VERCEL) module.exports = app;
+start();
