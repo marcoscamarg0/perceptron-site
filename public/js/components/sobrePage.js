@@ -188,7 +188,8 @@ function renderEquipeGrid() {
                 <span class="equipe-specialty">${m.specialty}</span>
                 ${!AppState.isAdminMode ? '<div class="equipe-ver-mais">Ver currículo →</div>' : ''}
             </div>
-            <div class="card-admin-actions ${AppState.isAdminMode ? 'active' : ''}">
+            ${AppState.isAdminMode ? `
+            <div class="card-admin-actions active">
                 <button class="action-btn edit-btn" data-id="${m.id}" title="Editar">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -200,7 +201,7 @@ function renderEquipeGrid() {
                         <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                     </svg>
                 </button>
-            </div>
+            </div>` : ''}
         `;
 
         // Clique no card — abre currículo (modo normal) ou edita (modo admin)
@@ -274,7 +275,7 @@ function openCurriculoModal(m, imgSrc) {
     ov.className = 'modal-overlay active';
     ov.style.zIndex = '400';
     ov.innerHTML = `
-        <div class="modal-box curriculo-modal" style="max-width:520px;padding:0;overflow:hidden;">
+        <div class="modal-box curriculo-modal" style="max-width:560px;padding:0;overflow:hidden;max-height:90vh;display:flex;flex-direction:column;">
             <button class="modal-x" id="cvClose" style="position:absolute;top:1rem;right:1rem;z-index:2">&times;</button>
             <div class="curriculo-header">
                 ${hasImg ? `<img src="${imgSrc}" alt="${m.name}" class="curriculo-foto" />` : `<div class="curriculo-foto-placeholder"><svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>`}
@@ -284,11 +285,24 @@ function openCurriculoModal(m, imgSrc) {
                     <span class="equipe-specialty" style="margin-top:.5rem;display:inline-block">${m.specialty}</span>
                 </div>
             </div>
-            <div class="curriculo-body">
+            <div class="curriculo-body" style="overflow-y:auto;flex:1;">
                 <div class="curriculo-section-label">Sobre</div>
                 <p class="curriculo-bio">${m.bio}</p>
-                ${m.formacao ? `<div class="curriculo-section-label" style="margin-top:1.25rem">Formação</div><p class="curriculo-bio">${m.formacao}</p>` : ''}
-                ${m.experiencia ? `<div class="curriculo-section-label" style="margin-top:1.25rem">Experiência</div><p class="curriculo-bio">${m.experiencia}</p>` : ''}
+                ${m.formacao ? `
+                <div class="curriculo-section-label" style="margin-top:1.5rem">Formação Acadêmica</div>
+                <p class="curriculo-bio">${m.formacao}</p>` : ''}
+                ${m.experiencia ? `
+                <div class="curriculo-section-label" style="margin-top:1.5rem">Experiência Profissional</div>
+                <p class="curriculo-bio">${m.experiencia}</p>` : ''}
+                ${m.publicacoes ? `
+                <div class="curriculo-section-label" style="margin-top:1.5rem">Publicações e Projetos</div>
+                <p class="curriculo-bio">${m.publicacoes}</p>` : ''}
+                ${m.idiomas ? `
+                <div class="curriculo-section-label" style="margin-top:1.5rem">Idiomas</div>
+                <p class="curriculo-bio">${m.idiomas}</p>` : ''}
+                ${m.linkedin ? `
+                <div class="curriculo-section-label" style="margin-top:1.5rem">LinkedIn</div>
+                <a href="${m.linkedin}" target="_blank" rel="noopener" class="curriculo-bio" style="color:var(--blue);text-decoration:none;">${m.linkedin}</a>` : ''}
             </div>
         </div>
     `;
@@ -327,7 +341,7 @@ function openMembroModal({ title, data = {}, onSave }) {
     ov.className = 'modal-overlay active';
     ov.style.zIndex = '400';
     ov.innerHTML = `
-        <div class="modal-box" style="max-width:560px">
+        <div class="modal-box" style="max-width:640px;max-height:90vh;overflow-y:auto;">
             <button class="modal-x" id="mbClose">&times;</button>
             <div class="modal-icon-wrap">
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -336,31 +350,57 @@ function openMembroModal({ title, data = {}, onSave }) {
                 </svg>
             </div>
             <h2 class="modal-title">${title}</h2>
-            <p class="modal-sub">Preencha os campos do consultor.</p>
-            <div class="form-group">
-                <label class="form-label">Nome completo</label>
-                <input class="form-input" id="mbName" value="${data.name||''}" placeholder="Nome Sobrenome" />
+            <p class="modal-sub">Preencha as informações do consultor. Os campos marcados com * são obrigatórios.</p>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div class="form-group" style="grid-column:1/-1">
+                    <label class="form-label">Nome completo *</label>
+                    <input class="form-input" id="mbName" value="${data.name||''}" placeholder="Ex: João Silva" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cargo *</label>
+                    <input class="form-input" id="mbRole" value="${data.role||''}" placeholder="Ex: Engenheiro Civil" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Especialidade *</label>
+                    <input class="form-input" id="mbSpec" value="${data.specialty||''}" placeholder="Ex: Rodovias · Concessões" />
+                </div>
             </div>
+
             <div class="form-group">
-                <label class="form-label">Cargo</label>
-                <input class="form-input" id="mbRole" value="${data.role||''}" placeholder="Engenheiro Civil — Infraestrutura" />
+                <label class="form-label">Resumo / Bio *</label>
+                <textarea class="form-textarea" id="mbBio" style="min-height:90px" placeholder="Breve descrição do consultor para o card...">${data.bio||''}</textarea>
             </div>
+
+            <div style="border-top:1px solid var(--border);margin:1.25rem 0 1rem;padding-top:1.25rem;">
+                <p style="font-family:var(--font-aux);font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:1rem;">Currículo Completo (visível ao clicar no card)</p>
+            </div>
+
             <div class="form-group">
-                <label class="form-label">Especialidade</label>
-                <input class="form-input" id="mbSpec" value="${data.specialty||''}" placeholder="Área · Área · Área" />
+                <label class="form-label">Formação Acadêmica</label>
+                <textarea class="form-textarea" id="mbFormacao" style="min-height:80px" placeholder="Ex: Graduação em Engenharia Civil pela USP (2005). Mestrado em Transportes pela UNICAMP (2008). Especialização em Regulação pela FGV (2012).">${data.formacao||''}</textarea>
             </div>
+
             <div class="form-group">
-                <label class="form-label">Bio / Resumo</label>
-                <textarea class="form-textarea" id="mbBio" style="min-height:80px" placeholder="Formação e experiência...">${data.bio||''}</textarea>
+                <label class="form-label">Experiência Profissional</label>
+                <textarea class="form-textarea" id="mbExp" style="min-height:100px" placeholder="Ex: 15 anos de atuação em concessões rodoviárias. Atuou na ANTT como especialista regulatório (2010-2015). Consultor sênior na XYZ Consultoria (2015-2020)...">${data.experiencia||''}</textarea>
             </div>
+
             <div class="form-group">
-                <label class="form-label">Formação (opcional)</label>
-                <textarea class="form-textarea" id="mbFormacao" style="min-height:60px" placeholder="Graduação, pós-graduação...">${data.formacao||''}</textarea>
+                <label class="form-label">Publicações e Projetos (opcional)</label>
+                <textarea class="form-textarea" id="mbPublicacoes" style="min-height:70px" placeholder="Ex: Co-autor do manual de regulação tarifária (ANEEL, 2018). Participou da estruturação da concessão da BR-163...">${data.publicacoes||''}</textarea>
             </div>
+
             <div class="form-group">
-                <label class="form-label">Experiência (opcional)</label>
-                <textarea class="form-textarea" id="mbExp" style="min-height:60px" placeholder="Empresas, projetos, anos...">${data.experiencia||''}</textarea>
+                <label class="form-label">Idiomas (opcional)</label>
+                <input class="form-input" id="mbIdiomas" value="${data.idiomas||''}" placeholder="Ex: Português (nativo), Inglês (avançado), Espanhol (intermediário)" />
             </div>
+
+            <div class="form-group">
+                <label class="form-label">LinkedIn (opcional)</label>
+                <input class="form-input" id="mbLinkedin" value="${data.linkedin||''}" placeholder="https://linkedin.com/in/..." />
+            </div>
+
             <button class="form-submit" id="mbSave">Salvar Consultor</button>
         </div>
     `;
@@ -371,13 +411,16 @@ function openMembroModal({ title, data = {}, onSave }) {
         if (!name) return alert('Nome é obrigatório');
         onSave({
             name,
-            role:       ov.querySelector('#mbRole').value.trim() || 'Consultor',
-            specialty:  ov.querySelector('#mbSpec').value.trim(),
-            bio:        ov.querySelector('#mbBio').value.trim(),
-            formacao:   ov.querySelector('#mbFormacao').value.trim(),
-            experiencia:ov.querySelector('#mbExp').value.trim(),
-            imageUrl:   data.imageUrl || '',
-            imageKey:   data.imageKey || null,
+            role:        ov.querySelector('#mbRole').value.trim() || 'Consultor',
+            specialty:   ov.querySelector('#mbSpec').value.trim(),
+            bio:         ov.querySelector('#mbBio').value.trim(),
+            formacao:    ov.querySelector('#mbFormacao').value.trim(),
+            experiencia: ov.querySelector('#mbExp').value.trim(),
+            publicacoes: ov.querySelector('#mbPublicacoes').value.trim(),
+            idiomas:     ov.querySelector('#mbIdiomas').value.trim(),
+            linkedin:    ov.querySelector('#mbLinkedin').value.trim(),
+            imageUrl:    data.imageUrl || '',
+            imageKey:    data.imageKey || null,
         });
         ov.remove();
     });
