@@ -162,7 +162,6 @@ function renderNoticiasGrid(tag = 'todos') {
                 reader.onload = (ev) => {
                     const idx = AppState.noticias.findIndex(x => x.id === item.id);
                     if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], imageUrl: ev.target.result };
-                    FirebaseDB.saveNoticia(item.id, AppState.noticias.find(x => x.id === item.id)).catch(e => console.warn('Firebase:', e));
                     saveNoticiasToStorage();
                     renderNoticiasGrid(document.querySelector('.filter-btn.active')?.dataset.tag || 'todos');
                 };
@@ -177,7 +176,6 @@ function renderNoticiasGrid(tag = 'todos') {
         card.querySelector('.delete-btn')?.addEventListener('click', () => {
             if (!AppState.isAdminMode || !confirm('Excluir esta publicação?')) return;
             AppState.noticias = AppState.noticias.filter(x => x.id !== item.id);
-            FirebaseDB.deleteNoticia(item.id).catch(e => console.warn('Firebase:', e));
             saveNoticiasToStorage();
             renderNoticiasGrid(document.querySelector('.filter-btn.active')?.dataset.tag || 'todos');
         });
@@ -197,28 +195,28 @@ function saveNoticiasToStorage() {
 }
 
 function openAddNewsModal() {
-    const ov = buildNewsModal({ title: 'Nova Publicação',
+    let ov;
+    ov = buildNewsModal({ title: 'Nova Publicação',
         onSave: (d) => {
             const nova = { id: Date.now().toString(), ...d, date: d.date || new Date().toLocaleDateString('pt-BR') };
             AppState.noticias = [nova, ...AppState.noticias];
-            FirebaseDB.saveNoticia(nova.id, nova).catch(e => console.warn('Firebase:', e));
             saveNoticiasToStorage();
+            if (ov) ov.remove();
             renderNoticiasGrid();
-            ov.remove();
         }
     });
     document.body.appendChild(ov);
 }
 
 function openEditNewsModal(item) {
-    const ov = buildNewsModal({ title: 'Editar Publicação', data: item,
+    let ov;
+    ov = buildNewsModal({ title: 'Editar Publicação', data: item,
         onSave: (d) => {
             const idx = AppState.noticias.findIndex(x => x.id === item.id);
             if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], ...d };
-            FirebaseDB.saveNoticia(item.id, AppState.noticias[idx !== -1 ? idx : 0]).catch(e => console.warn('Firebase:', e));
             saveNoticiasToStorage();
+            if (ov) ov.remove();
             renderNoticiasGrid();
-            ov.remove();
         }
     });
     document.body.appendChild(ov);
@@ -275,10 +273,10 @@ function buildNewsModal({ title, data = {}, onSave }) {
     `;
     ov.querySelector('#nmClose').addEventListener('click', () => ov.remove());
     ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
-    ov.querySelector('#nmSave').addEventListener('click', async () => {
+    ov.querySelector('#nmSave').addEventListener('click', () => {
         const t = ov.querySelector('#nmTitle').value.trim();
         if (!t) return alert('Título é obrigatório');
-        await onSave({
+        onSave({
             title: t,
             summary: ov.querySelector('#nmSummary').value.trim(),
             tag:      ov.querySelector('#nmTag').value,
