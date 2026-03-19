@@ -170,6 +170,9 @@ function renderNoticiasGrid(tag = 'todos') {
             });
         }
 
+        card.querySelector('.noticia-read-more')?.addEventListener('click', () => {
+            if (!AppState.isAdminMode) openArtigoPage(item);
+        });
         card.querySelector('.edit-btn')?.addEventListener('click', () => openEditNewsModal(item));
         card.querySelector('.delete-btn')?.addEventListener('click', () => {
             if (!AppState.isAdminMode || !confirm('Excluir esta publicação?')) return;
@@ -263,6 +266,10 @@ function buildNewsModal({ title, data = {}, onSave }) {
                     <input class="form-input" id="nmImg" value="${data.imageUrl||''}" placeholder="https://..." />
                 </div>
             </div>
+            <div class="form-group">
+                <label class="form-label">Conteúdo completo do artigo</label>
+                <textarea class="form-textarea" id="nmContent" style="min-height:200px;font-family:monospace;font-size:.82rem" placeholder="Escreva aqui o artigo completo. Separe parágrafos com uma linha em branco.">${data.content||''}</textarea>
+            </div>
             <button class="form-submit" id="nmSave">Publicar</button>
         </div>
     `;
@@ -276,8 +283,74 @@ function buildNewsModal({ title, data = {}, onSave }) {
             summary: ov.querySelector('#nmSummary').value.trim(),
             tag:      ov.querySelector('#nmTag').value,
             imageUrl: ov.querySelector('#nmImg').value.trim(),
+            content:  ov.querySelector('#nmContent').value.trim(),
             date: data.date || new Date().toLocaleDateString('pt-BR')
         });
     });
     return ov;
+}
+
+// ── Página de artigo completo ─────────────────────
+function openArtigoPage(item) {
+    // Esconde todas as páginas
+    ['homePage','sobrePage','noticiasPage','contatoPage'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+
+    // Cria ou reutiliza a página de artigo
+    let artigoPage = document.getElementById('artigoPage');
+    if (!artigoPage) {
+        artigoPage = document.createElement('div');
+        artigoPage.id = 'artigoPage';
+        document.querySelector('.footer').insertAdjacentElement('beforebegin', artigoPage);
+    }
+    artigoPage.classList.remove('hidden');
+
+    // Formata parágrafos
+    const paragrafos = (item.content || item.summary)
+        .split(/\n\n+/)
+        .filter(p => p.trim())
+        .map(p => `<p class="artigo-paragrafo">${p.replace(/\n/g,'<br>')}</p>`)
+        .join('');
+
+    const hasImg = item.imageUrl && item.imageUrl.trim() !== '';
+
+    artigoPage.innerHTML = `
+        <div class="artigo-page">
+            <div class="artigo-back" id="artigoBack">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 12H5M12 5l-7 7 7 7"/>
+                </svg>
+                Voltar para Conteúdos
+            </div>
+            <div class="artigo-container">
+                <div class="artigo-header">
+                    <span class="artigo-tag">${item.tag}</span>
+                    <div class="artigo-meta">${item.date}</div>
+                    <h1 class="artigo-titulo">${item.title}</h1>
+                    <p class="artigo-resumo">${item.summary}</p>
+                </div>
+                ${hasImg ? `<div class="artigo-img-wrap"><img src="${item.imageUrl}" alt="${item.title}" class="artigo-img" /></div>` : ''}
+                <div class="artigo-content">
+                    ${item.content ? paragrafos : '<p class="artigo-paragrafo" style="color:var(--text-muted);font-style:italic">Conteúdo completo não disponível.</p>'}
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('artigoBack').addEventListener('click', () => {
+        artigoPage.classList.add('hidden');
+        document.getElementById('noticiasPage').classList.remove('hidden');
+        AppState.currentPage = 'noticias';
+        // Atualiza nav
+        document.querySelectorAll('[data-page]').forEach(btn =>
+            btn.classList.toggle('active', btn.dataset.page === 'noticias')
+        );
+    });
+
+    // Header page-mode
+    document.getElementById('header').classList.add('page-mode');
+    AppState.currentPage = 'artigo';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }

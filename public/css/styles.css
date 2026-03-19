@@ -1037,3 +1037,67 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
 .equipe-admin-delete:hover { background: rgba(224,85,85,.08); }
 :root.dark .equipe-admin-bar { border-top-color: var(--border); }
 :root.dark .equipe-admin-edit { border-right-color: var(--border); }
+
+/* ── PÁGINA DE ARTIGO ────────────────────────────── */
+.artigo-page {
+    min-height: 100vh;
+    background: var(--bg);
+    padding-top: 68px;
+}
+.artigo-back {
+    display: inline-flex; align-items: center; gap: .5rem;
+    margin: 2rem 2.5rem;
+    font-family: var(--font-aux); font-size: .68rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--blue); cursor: pointer; transition: gap .2s;
+}
+.artigo-back:hover { gap: .8rem; }
+.artigo-container {
+    max-width: 760px; margin: 0 auto;
+    padding: 0 2rem 5rem;
+}
+.artigo-header { margin-bottom: 2.5rem; }
+.artigo-tag {
+    display: inline-block;
+    font-family: var(--font-aux); font-size: .6rem; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: white; background: var(--blue);
+    padding: .28rem .75rem; border-radius: 99px;
+    margin-bottom: 1rem;
+}
+.artigo-meta {
+    font-family: var(--font-aux); font-size: .68rem;
+    color: var(--text-muted); margin-bottom: .75rem;
+}
+.artigo-titulo {
+    font-family: var(--font-title); font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800; color: var(--primary);
+    line-height: 1.15; margin-bottom: 1.25rem;
+    text-transform: uppercase;
+}
+.artigo-resumo {
+    font-family: var(--font-body); font-size: 1.05rem;
+    color: var(--text-muted); line-height: 1.7;
+    border-left: 3px solid var(--blue);
+    padding-left: 1.25rem;
+    font-style: italic;
+}
+.artigo-img-wrap {
+    margin: 2rem 0;
+    border-radius: 8px; overflow: hidden;
+}
+.artigo-img {
+    width: 100%; height: auto; max-height: 420px;
+    object-fit: cover; display: block;
+}
+.artigo-content { margin-top: 2rem; }
+.artigo-paragrafo {
+    font-family: var(--font-body); font-size: 1rem;
+    color: var(--text); line-height: 1.85;
+    margin-bottom: 1.5rem;
+}
+
+/* Dark */
+:root.dark .artigo-page { background: var(--bg); }
+:root.dark .artigo-titulo { color: var(--text); }
+:root.dark .artigo-paragrafo { color: rgba(226,238,244,.75); }
