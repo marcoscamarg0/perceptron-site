@@ -50,21 +50,20 @@ function renderHeroSection() {
                     <div class="hero-card-stack">
                         <div class="hero-card hero-card-1">
                             <div class="hero-stat">
-                                <div class="hero-stat-num">17+</div>
-                                <div class="hero-stat-label">Anos de exp. dos consultores</div>
+                                <div class="hero-stat-num">+20</div>
+                                <div class="hero-stat-label">Anos de experiência dos consultores</div>
                             </div>
                             <div class="hero-divider"></div>
                             <div class="hero-stat">
-                                <div class="hero-stat-num">6</div>
+                                <div class="hero-stat-num">9+</div>
                                 <div class="hero-stat-label">Áreas de atuação</div>
                             </div>
                             <div class="hero-divider"></div>
-                            <span class="hero-tag">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>
-                                Projetos em andamento
-                            </span>
+                            <div class="hero-stat">
+                                <div class="hero-stat-num">+5</div>
+                                <div class="hero-stat-label">Consultores especializados</div>
+                            </div>
                         </div>
-                        <div class="hero-card hero-card-2"></div>
                     </div>
                 </div>
             </div>
