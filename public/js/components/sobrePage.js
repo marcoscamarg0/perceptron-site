@@ -117,7 +117,7 @@ async function renderSobrePage() {
                     <span class="section-label-text">Parceiros</span>
                 </div>
                 <div class="parceiros-grid">
-                    <a href="https://fia.com.br/" target="_blank" rel="noopener" class="parceiro-card">
+                    <a href="https://www.fia.com.br" target="_blank" rel="noopener" class="parceiro-card">
                         <div class="parceiro-badge">Parceiro Estratégico</div>
                         <img src="/fia_logo.png" alt="FIA Business School" class="parceiro-logo" />
                         <div class="parceiro-divider"></div>

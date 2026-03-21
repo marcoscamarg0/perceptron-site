@@ -27,9 +27,9 @@ function renderAreasSection() {
         },
         {
             num: '05',
-            title: 'Iluminação Pública',
-            desc: 'Oferecemos soluções em iluminação pública municipal, incluindo modernização de redes, eficiência energética e gestão inteligente de iluminação. Nossa equipe trabalha para melhorar a segurança e a qualidade de vida nas cidades.',
-            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M12 2v1M12 6a6 6 0 0 1 6 6c0 2.5-1.5 4.5-3 6H9c-1.5-1.5-3-3.5-3-6a6 6 0 0 1 6-6z"/></svg>`
+            title: 'Ferrovias',
+            desc: 'Suporte técnico para projetos e operações ferroviárias com foco em eficiência operacional, capacidade, indicadores e investimentos, estruturando monitoramento e governança para contratos e ativos.',
+            icon: `<svg class="area-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="M8 19l-2 2M16 19l2 2"/></svg>`
         },
         {
             num: '06',
@@ -92,7 +92,7 @@ function renderAreasSection() {
                         <div class="number-stat-label">Anos de Experiência</div>
                     </div>
                     <div class="number-stat">
-                        <div class="number-stat-value">9+</div>
+                        <div class="number-stat-value">+8</div>
                         <div class="number-stat-label">Áreas de Atuação</div>
                     </div>
                     <div class="number-stat">
