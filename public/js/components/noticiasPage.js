@@ -277,94 +277,150 @@ function openEditNewsModal(item) {
 
 function buildNewsModal({ title, data = {}, onSave }) {
     const ov = document.createElement('div');
-    ov.className = 'modal-overlay active editor-overlay';
-    ov.style.cssText = 'z-index:500;align-items:flex-start;padding:0;overflow-y:auto;';
+    ov.className = 'modal-overlay active';
+    ov.style.cssText = 'z-index:500;padding:0;align-items:flex-start;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);';
 
     const TAGS = ['Saneamento','Setor Elétrico','Rodovias','Gestão Pública','Concessões','Regulação','Infraestrutura','Geral'];
+    const isEdit = !!data.id;
 
     ov.innerHTML = `
-        <div class="editor-box">
-            <div class="editor-toolbar">
-                <span class="editor-title-bar">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                    </svg>
-                    ${title}
-                </span>
-                <div class="editor-actions">
-                    <button class="editor-btn-cancel" id="nmCancel">Cancelar</button>
-                    <button class="editor-btn-save" id="nmSave">Salvar e Publicar</button>
+    <div class="ned-wrap">
+        <!-- Sidebar -->
+        <div class="ned-sidebar">
+            <div class="ned-logo">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                <span>${isEdit ? 'Editar' : 'Nova publicação'}</span>
+            </div>
+
+            <div class="ned-field">
+                <label class="ned-label">Categoria</label>
+                <div class="ned-tags-grid" id="nmTagGrid">
+                    ${TAGS.map(t => `<button class="ned-tag-btn ${data.tag===t?'active':''}" data-tag="${t}">${t}</button>`).join('')}
                 </div>
             </div>
 
-            <div class="editor-meta-row">
-                <div class="form-group" style="flex:2;min-width:200px">
-                    <label class="form-label">Título *</label>
-                    <input class="form-input" id="nmTitle" value="${data.title||''}" placeholder="Título do artigo" />
+            <div class="ned-field">
+                <label class="ned-label">Imagem de capa</label>
+                <div class="ned-img-area" id="nmImgArea">
+                    ${data.imageUrl ? `<img src="${data.imageUrl}" class="ned-img-preview" id="nmImgPreview" />` : `<div class="ned-img-placeholder" id="nmImgPreview"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>Sem imagem</span></div>`}
                 </div>
-                <div class="form-group" style="flex:1;min-width:150px">
-                    <label class="form-label">Categoria</label>
-                    <select class="form-select" id="nmTag">
-                        ${TAGS.map(t => `<option value="${t}" ${data.tag===t?'selected':''}>${t}</option>`).join('')}
-                    </select>
-                </div>
-                <div class="form-group" style="flex:1;min-width:150px">
-                    <label class="form-label">URL da Imagem</label>
-                    <input class="form-input" id="nmImg" value="${data.imageUrl||''}" placeholder="https://..." />
+                <input class="ned-input" id="nmImg" value="${data.imageUrl&&!data.imageUrl.startsWith('data:')?data.imageUrl:''}" placeholder="Cole uma URL de imagem..." style="margin-top:8px" />
+                <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+                    <span class="ned-label" style="margin:0">ou</span>
+                    <label class="ned-upload-btn">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Upload
+                        <input type="file" id="nmImgFile" accept="image/*" style="display:none">
+                    </label>
                 </div>
             </div>
 
-            <div class="form-group" style="padding:0 2rem 1rem">
-                <label class="form-label">Resumo *</label>
-                <textarea class="form-textarea" id="nmSummary" style="min-height:65px">${data.summary||''}</textarea>
+            <div class="ned-field">
+                <label class="ned-label">Resumo</label>
+                <textarea class="ned-textarea" id="nmSummary" placeholder="Breve descrição do artigo...">${data.summary||''}</textarea>
             </div>
 
-            <div class="editor-content-wrap">
-                <div class="editor-format-bar">
-                    <button class="efmt-btn" data-fmt="## ">H2</button>
-                    <button class="efmt-btn" data-fmt="### ">H3</button>
-                    <div class="efmt-sep"></div>
-                    <button class="efmt-btn" data-fmt="**" data-wrap="true"><strong>N</strong></button>
-                    <button class="efmt-btn efmt-italic" data-fmt="_" data-wrap="true"><em>I</em></button>
-                    <div class="efmt-sep"></div>
-                    <button class="efmt-btn" data-list="true">— Lista</button>
-                    <div class="efmt-sep"></div>
-                    <span class="efmt-hint">## Subtítulo &nbsp;|&nbsp; **negrito** &nbsp;|&nbsp; _itálico_ &nbsp;|&nbsp; Linha em branco = novo parágrafo</span>
-                </div>
-                <div class="editor-split">
-                    <textarea class="editor-textarea" id="nmContent" placeholder="Escreva o artigo completo aqui...
-
-## Subtítulo da seção
-
-Parágrafo normal. Use uma linha em branco para separar parágrafos.
-
-### Subtítulo menor
-
-- Item de lista
-- Outro item
-
-Use **negrito** e _itálico_ para destacar.">${data.content||''}</textarea>
-                    <div class="editor-split-preview">
-                        <div class="editor-preview-label">Pré-visualização</div>
-                        <div class="editor-preview" id="nmPreview"></div>
-                    </div>
-                </div>
+            <div class="ned-sidebar-actions">
+                <button class="ned-btn-cancel" id="nmCancel">Cancelar</button>
+                <button class="ned-btn-publish" id="nmSave">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                    ${isEdit ? 'Salvar' : 'Publicar'}
+                </button>
             </div>
         </div>
-    `;
 
+        <!-- Editor area -->
+        <div class="ned-editor-area">
+            <input class="ned-title-input" id="nmTitle" value="${data.title||''}" placeholder="Título do artigo..." />
+
+            <div class="ned-toolbar">
+                <button class="ned-tb-btn" data-fmt="## " title="Subtítulo H2">H2</button>
+                <button class="ned-tb-btn" data-fmt="### " title="Subtítulo H3">H3</button>
+                <div class="ned-tb-sep"></div>
+                <button class="ned-tb-btn ned-tb-bold" data-fmt="**" data-wrap="true" title="Negrito"><strong>B</strong></button>
+                <button class="ned-tb-btn ned-tb-italic" data-fmt="_" data-wrap="true" title="Itálico"><em>I</em></button>
+                <div class="ned-tb-sep"></div>
+                <button class="ned-tb-btn" data-list="true" title="Lista">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                </button>
+                <div class="ned-tb-sep"></div>
+                <span class="ned-tb-hint">## subtítulo · **negrito** · _itálico_ · linha em branco = parágrafo</span>
+                <button class="ned-preview-toggle" id="nmPreviewToggle">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Prévia
+                </button>
+            </div>
+
+            <div class="ned-content-area">
+                <textarea class="ned-content" id="nmContent" placeholder="Escreva o conteúdo do artigo aqui...
+
+Use ## para subtítulos, **negrito**, _itálico_ e - para listas.
+
+Separe os parágrafos com uma linha em branco.">${data.content||''}</textarea>
+                <div class="ned-preview" id="nmPreview" style="display:none"></div>
+            </div>
+        </div>
+    </div>`;
+
+    // Tag selection
+    ov.querySelectorAll('.ned-tag-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            ov.querySelectorAll('.ned-tag-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    // Image URL preview
+    const imgInput = ov.querySelector('#nmImg');
+    imgInput.addEventListener('input', () => updateImgPreview(imgInput.value));
+
+    // Image upload
+    ov.querySelector('#nmImgFile').addEventListener('change', (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            resizeImage(file, 1200, 630, (url) => {
+                updateImgPreview(url);
+                imgInput.value = '';
+                imgInput.dataset.upload = url;
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+
+    function updateImgPreview(url) {
+        const area = ov.querySelector('#nmImgArea');
+        if (url && url.trim()) {
+            area.innerHTML = `<img src="${url}" class="ned-img-preview" />`;
+        } else {
+            area.innerHTML = `<div class="ned-img-placeholder"><svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>Sem imagem</span></div>`;
+        }
+    }
+
+    // Preview toggle
     const textarea = ov.querySelector('#nmContent');
-    const preview  = ov.querySelector('#nmPreview');
+    const previewEl = ov.querySelector('#nmPreview');
+    const previewBtn = ov.querySelector('#nmPreviewToggle');
+    let previewing = false;
+
+    previewBtn.addEventListener('click', () => {
+        previewing = !previewing;
+        textarea.style.display = previewing ? 'none' : 'block';
+        previewEl.style.display = previewing ? 'block' : 'none';
+        previewBtn.classList.toggle('active', previewing);
+        previewBtn.querySelector('span, svg + *') ;
+        previewBtn.childNodes[1] && (previewBtn.childNodes[1].textContent = previewing ? ' Editar' : ' Prévia');
+        if (previewing) renderPreview();
+    });
 
     function renderPreview() {
         const text = textarea.value;
-        if (!text.trim()) {
-            preview.innerHTML = '<p style="color:var(--text-muted);font-style:italic;font-size:.85rem">A pré-visualização aparece aqui...</p>';
-            return;
-        }
+        if (!text.trim()) { previewEl.innerHTML = '<p style="color:var(--text-muted);font-style:italic">Nenhum conteúdo ainda...</p>'; return; }
         const paras = text.split('\n\n').filter(p => p.trim());
-        preview.innerHTML = paras.map(p => {
+        previewEl.innerHTML = paras.map(p => {
             if (p.startsWith('## '))  return '<h2 class="artigo-h2">'  + p.replace('## ','')  + '</h2>';
             if (p.startsWith('### ')) return '<h3 class="artigo-h3">'  + p.replace('### ','') + '</h3>';
             if (p.startsWith('- '))   return '<ul class="artigo-list">' + p.split('\n').filter(l=>l.startsWith('- ')).map(l=>'<li>'+l.slice(2)+'</li>').join('') + '</ul>';
@@ -372,48 +428,40 @@ Use **negrito** e _itálico_ para destacar.">${data.content||''}</textarea>
         }).join('');
     }
 
-    textarea.addEventListener('input', renderPreview);
-    renderPreview();
-
     // Format buttons
-    ov.querySelectorAll('.efmt-btn').forEach(btn => {
+    ov.querySelectorAll('.ned-tb-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const fmt  = btn.dataset.fmt;
             const wrap = btn.dataset.wrap;
             const list = btn.dataset.list;
-            const start = textarea.selectionStart;
-            const end   = textarea.selectionEnd;
-            const sel   = textarea.value.substring(start, end);
+            if (!fmt && !wrap && !list) return;
+            const s = textarea.selectionStart, e2 = textarea.selectionEnd;
+            const sel = textarea.value.substring(s, e2);
             let val = textarea.value;
-            if (wrap && sel) {
-                val = val.substring(0,start) + fmt + sel + fmt + val.substring(end);
-            } else if (list) {
-                val = val.substring(0,start) + '- ' + val.substring(start);
-            } else {
-                const lineStart = val.lastIndexOf('\n', start-1) + 1;
-                val = val.substring(0,lineStart) + fmt + val.substring(lineStart);
-            }
-            textarea.value = val;
-            textarea.focus();
-            renderPreview();
+            if (wrap && sel) { val = val.substring(0,s)+fmt+sel+fmt+val.substring(e2); }
+            else if (list)   { val = val.substring(0,s)+'- '+val.substring(s); }
+            else if (fmt)    { const ls = val.lastIndexOf('\n',s-1)+1; val = val.substring(0,ls)+fmt+val.substring(ls); }
+            textarea.value = val; textarea.focus();
         });
     });
 
     ov.querySelector('#nmCancel').addEventListener('click', () => ov.remove());
+    ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
 
     ov.querySelector('#nmSave').addEventListener('click', () => {
         const t = ov.querySelector('#nmTitle').value.trim();
-        if (!t) return alert('Título é obrigatório');
-        const tag = ov.querySelector('#nmTag').value;
+        if (!t) { ov.querySelector('#nmTitle').focus(); ov.querySelector('#nmTitle').style.borderColor='var(--blue)'; return; }
+        const activeTag = ov.querySelector('.ned-tag-btn.active');
+        const tag = activeTag ? activeTag.dataset.tag : (data.tag || 'Geral');
+        const imgUrl = imgInput.dataset.upload || imgInput.value.trim() || data.imageUrl || '';
         onSave({
             title:    t,
             summary:  ov.querySelector('#nmSummary').value.trim(),
             tag,
-            imageUrl: ov.querySelector('#nmImg').value.trim(),
+            imageUrl: imgUrl,
             content:  textarea.value.trim(),
             date:     data.date || new Date().toLocaleDateString('pt-BR')
         });
-        // Após salvar, ativa o filtro da categoria
         setTimeout(() => {
             const filterBtn = document.querySelector(`.filter-btn[data-tag="${tag}"]`);
             if (filterBtn) {
