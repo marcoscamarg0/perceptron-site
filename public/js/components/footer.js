@@ -10,7 +10,7 @@ function renderFooter() {
                     Consultoria especializada em regulação e infraestrutura. Apoio técnico e estratégico para serviços públicos, concessões e projetos de infraestrutura.
                 </p>
                 <div class="footer-social">
-                    <div class="footer-social-btn" title="LinkedIn">
+                    <div class="footer-social-btn" title="LinkedIn" onclick="window.open('https://www.linkedin.com/company/perceptron-consultoria','_blank')" style="cursor:pointer">
                         <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
                             <rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/>

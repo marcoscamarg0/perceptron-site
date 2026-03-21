@@ -48,7 +48,7 @@ async function renderSobrePage() {
                         A <strong>Perceptron Consultoria</strong> é especializada em regulação e infraestrutura, com foco em apoio técnico e estratégico para planejar, regular, contratar, operar e melhorar serviços públicos e concessões.
                     </p>
                     <p class="sobre-text-body">
-                        Nosso foco é sempre a excelência. Na Perceptron, a busca pela excelência orienta cada entrega, do diagnóstico à recomendação final. Atuamos com rigor técnico, clareza e compromisso com resultados, transformando complexidade em decisões seguras e aplicáveis no setor de infraestrutura.
+                        Com mais de 5 consultores em atividade, nosso foco é sempre a excelência. Na Perceptron, a busca pela excelência orienta cada entrega, do diagnóstico à recomendação final. Atuamos com rigor técnico, clareza e compromisso com resultados, transformando complexidade em decisões seguras e aplicáveis no setor de infraestrutura.
                     </p>
                     <p class="sobre-text-body">
                         Somos uma equipe multidisciplinar que integra regulação, gestão pública, direito e diferentes ramos da engenharia. Essa combinação amplia a capacidade de compreender o problema por inteiro, alinhar visão institucional e operacional, e construir soluções que funcionem na prática.
@@ -148,11 +148,11 @@ async function renderSobrePage() {
 function saveEquipeToStorage(membro) {
     // Salva no backend (MongoDB) — persiste em todos os dispositivos
     if (membro) {
-        if (['1','2','3','4','5'].includes(membro.id)) {
-            API.updateMembro(membro.id, membro).catch(e => console.warn('API:', e));
-        } else {
-            API.createMembro(membro).catch(e => console.warn('API:', e));
-        }
+        // Sempre usa updateMembro para garantir que todos os campos incluindo linkedin sejam salvos
+        API.updateMembro(membro.id, membro).catch(e => {
+            // Se não existir ainda, cria
+            API.createMembro(membro).catch(e2 => console.warn('API:', e2));
+        });
     }
     // Também salva no localStorage como backup
     const edits = {};
@@ -347,9 +347,11 @@ function openAddMembroModal() {
 function openEditMembroModal(m) {
     openMembroModal({ title: 'Editar Consultor', data: m,
         onSave: (d) => {
+            const atualizado = { ...m, ...d };
             const idx = AppState.equipe.findIndex(x => x.id === m.id);
-            if (idx !== -1) AppState.equipe[idx] = { ...AppState.equipe[idx], ...d };
-            saveEquipeToStorage();
+            if (idx !== -1) AppState.equipe[idx] = atualizado;
+            // Salva direto na API com todos os campos
+            API.updateMembro(m.id, atualizado).catch(e => console.warn('API updateMembro:', e));
             renderEquipeGrid();
         }
     });
