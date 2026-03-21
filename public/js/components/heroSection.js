@@ -55,7 +55,7 @@ function renderHeroSection() {
                             </div>
                             <div class="hero-divider"></div>
                             <div class="hero-stat">
-                                <div class="hero-stat-num">9+</div>
+                                <div class="hero-stat-num">+8</div>
                                 <div class="hero-stat-label">Áreas de atuação</div>
                             </div>
                             <div class="hero-divider"></div>

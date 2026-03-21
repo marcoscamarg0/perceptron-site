@@ -106,7 +106,7 @@ async function renderSobrePage() {
                     </div>
                     <div class="timeline-item">
                         <div class="timeline-year">Contato</div>
-                        <div class="timeline-desc">+55 61 98180-2825. Atendimento presencial e remoto para todo o Brasil, com foco em setores regulados e infraestrutura pública.</div>
+                        <div class="timeline-desc">+55 61 8180-2825. Atendimento presencial e remoto para todo o Brasil, com foco em setores regulados e infraestrutura pública.</div>
                     </div>
                 </div>
             </div>

@@ -92,7 +92,7 @@ function renderAreasSection() {
                         <div class="number-stat-label">Anos de Experiência</div>
                     </div>
                     <div class="number-stat">
-                        <div class="number-stat-value">9+</div>
+                        <div class="number-stat-value">+8</div>
                         <div class="number-stat-label">Áreas de Atuação</div>
                     </div>
                     <div class="number-stat">

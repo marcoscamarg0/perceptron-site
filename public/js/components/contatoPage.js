@@ -54,7 +54,7 @@ function renderContatoPage() {
                         </div>
                         <div>
                             <div class="contato-info-label">Telefone & WhatsApp</div>
-                            <div class="contato-info-value">+55 (61) 98180-2825</div>
+                            <div class="contato-info-value">+55 (61) 8180-2825</div>
                         </div>
                     </div>
                     <div class="contato-info-item">
