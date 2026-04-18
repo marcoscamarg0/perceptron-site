@@ -1,6 +1,24 @@
-const express = require('express');
-const cors    = require('cors');
-const path    = require('path');
+const express    = require('express');
+const cors       = require('cors');
+const path       = require('path');
+const nodemailer = require('nodemailer');
+
+// ── Configuração de E-mail ────────────────────────────
+// Configure via variáveis de ambiente:
+//   EMAIL_USER     → conta de envio (ex: smtp-user@provedor.com)
+//   EMAIL_PASS     → senha ou app password
+//   EMAIL_HOST     → servidor SMTP (padrão: smtp.gmail.com)
+//   EMAIL_PORT     → porta SMTP (padrão: 587)
+//   CONTACT_EMAIL  → destino (padrão: contato@perceptronconsult.com)
+const emailTransport = nodemailer.createTransport({
+    host:   process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port:   parseInt(process.env.EMAIL_PORT || '587'),
+    secure: false,
+    auth: {
+        user: process.env.EMAIL_USER || '',
+        pass: process.env.EMAIL_PASS || '',
+    },
+});
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -155,6 +173,53 @@ app.delete('/api/equipe/:id', async (req, res) => {
     if (!memEquipe.find(m => m.id === req.params.id)) return res.status(404).json({ error: 'Não encontrado' });
     memEquipe = memEquipe.filter(m => m.id !== req.params.id);
     res.status(204).send();
+});
+
+// ── CONTATO (envio de e-mail) ─────────────────────────
+app.post('/api/contato', async (req, res) => {
+    const { nome, empresa, email, telefone, area, mensagem } = req.body;
+    if (!nome || !email || !mensagem) {
+        return res.status(400).json({ error: 'Campos obrigatórios: nome, email, mensagem' });
+    }
+
+    const DEST = process.env.CONTACT_EMAIL || 'contato@perceptronconsult.com';
+
+    const htmlBody = `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f9f9f9;border-radius:8px;overflow:hidden">
+            <div style="background:#0a4555;padding:24px 32px">
+                <h2 style="color:#fff;margin:0;font-size:20px">📩 Nova mensagem via site — Perceptron Consultoria</h2>
+            </div>
+            <div style="padding:28px 32px;background:#fff">
+                <table style="width:100%;border-collapse:collapse;font-size:14px">
+                    <tr><td style="padding:8px 0;color:#666;width:160px"><strong>Nome</strong></td><td style="padding:8px 0;color:#222">${nome}</td></tr>
+                    ${empresa ? `<tr><td style="padding:8px 0;color:#666"><strong>Empresa / Órgão</strong></td><td style="padding:8px 0;color:#222">${empresa}</td></tr>` : ''}
+                    <tr><td style="padding:8px 0;color:#666"><strong>E-mail</strong></td><td style="padding:8px 0;color:#222"><a href="mailto:${email}" style="color:#0a4555">${email}</a></td></tr>
+                    ${telefone ? `<tr><td style="padding:8px 0;color:#666"><strong>Telefone</strong></td><td style="padding:8px 0;color:#222">${telefone}</td></tr>` : ''}
+                    ${area ? `<tr><td style="padding:8px 0;color:#666"><strong>Área de Interesse</strong></td><td style="padding:8px 0;color:#222">${area}</td></tr>` : ''}
+                </table>
+                <hr style="border:none;border-top:1px solid #eee;margin:20px 0">
+                <p style="color:#666;font-size:13px;margin:0 0 8px"><strong>Mensagem:</strong></p>
+                <div style="background:#f5f5f5;border-radius:6px;padding:16px;color:#333;font-size:14px;line-height:1.6;white-space:pre-wrap">${mensagem}</div>
+            </div>
+            <div style="padding:16px 32px;background:#f0f0f0;font-size:12px;color:#999;text-align:center">
+                Enviado automaticamente pelo site perceptronconsult.com
+            </div>
+        </div>
+    `;
+
+    try {
+        await emailTransport.sendMail({
+            from:    `"Site Perceptron" <${process.env.EMAIL_USER || DEST}>`,
+            to:      DEST,
+            replyTo: email,
+            subject: `[Site] Nova consulta de ${nome}${area ? ` — ${area}` : ''}`,
+            html:    htmlBody,
+        });
+        res.json({ ok: true, message: 'Mensagem enviada com sucesso!' });
+    } catch (err) {
+        console.error('Erro ao enviar e-mail:', err.message);
+        res.status(500).json({ error: 'Falha ao enviar mensagem. Tente novamente.' });
+    }
 });
 
 // ── Rotas SPA ─────────────────────────────────────────
