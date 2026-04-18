@@ -21,6 +21,6 @@ function submitContato() {
     if (area)     texto += 'Área de interesse: ' + area + '\n';
     if (mensagem) texto += '\nMensagem:\n' + mensagem;
 
-    var url = 'https://wa.me/5561981802825?text=' + encodeURIComponent(texto);
+    var url = 'https://wa.me/5561818028825?text=' + encodeURIComponent(texto);
     window.open(url, '_blank');
 }
