@@ -1936,3 +1936,107 @@ h1, h2, h3, h4 { font-family: var(--font-title); }
     .parceiro-logo  { max-width: 240px; }
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   NOVOS ESTILOS — Manutenção 2025
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Conteúdo de artigo — garantir negrito e itálico ────────────── */
+.artigo-content strong,
+.artigo-content b,
+.artigo-paragrafo strong,
+.artigo-paragrafo b       { font-weight: 700 !important; }
+.artigo-content em,
+.artigo-content i,
+.artigo-paragrafo em,
+.artigo-paragrafo i       { font-style: italic !important; }
+
+/* ── Botão "Copiar link" no card de notícia ─────────────────────── */
+.noticia-copy-link {
+    display: inline-flex; align-items: center; gap: .3rem;
+    background: none; border: 1px solid var(--border);
+    border-radius: 6px; padding: .28rem .55rem;
+    font-family: var(--font-aux); font-size: .65rem; font-weight: 600;
+    color: var(--text-muted); cursor: pointer;
+    letter-spacing: .04em; transition: all .2s;
+    flex-shrink: 0;
+}
+.noticia-copy-link:hover { background: var(--cream); color: var(--blue); border-color: var(--blue); }
+
+/* ── Botão "Copiar link" na página do artigo ────────────────────── */
+.artigo-copy-link {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: none; border: 1px solid var(--border);
+    border-radius: 8px; padding: .4rem .85rem;
+    font-family: var(--font-aux); font-size: .72rem; font-weight: 600;
+    color: var(--text-muted); cursor: pointer;
+    letter-spacing: .05em; transition: all .2s;
+    margin-left: 1rem; margin-bottom: .5rem;
+}
+.artigo-copy-link:hover { background: var(--cream); color: var(--blue); border-color: var(--blue); }
+
+/* ── Formulário de contato — mensagem de feedback ───────────────── */
+.contato-feedback {
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    font-family: var(--font-aux);
+    font-size: .82rem;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-top: 1rem;
+    animation: fadeUp .35s ease;
+}
+.contato-feedback--ok   { background: #e8f8ef; color: #1a7a42; border: 1px solid #b5e5cb; }
+.contato-feedback--erro { background: #fdf0f0; color: #c0392b; border: 1px solid #f3c0c0; }
+
+/* ── Painel de temas (admin) ────────────────────────────────────── */
+.temas-admin-box {
+    background: var(--card-bg);
+    border-radius: 14px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 520px;
+    margin: 3rem auto;
+    box-shadow: 0 8px 40px rgba(0,0,0,.18);
+}
+.temas-admin-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+}
+.temas-admin-header h2 { font-size: 1.15rem; font-family: var(--font-title); }
+.tema-nova-row {
+    display: flex; gap: .5rem; align-items: center;
+    background: var(--cream); border-radius: 8px; padding: .5rem;
+}
+.tema-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .65rem .75rem; border-radius: 8px;
+    border: 1px solid var(--border); margin-bottom: .4rem;
+    background: var(--card-bg); transition: background .15s;
+}
+.tema-row:hover     { background: var(--cream); }
+.tema-row-nome      { font-weight: 600; font-size: .9rem; }
+.tema-row-actions   { display: flex; gap: .4rem; }
+.tema-btn-rename,
+.tema-btn-delete    { background: none; border: none; cursor: pointer; font-size: 1rem; padding: .2rem .4rem; border-radius: 5px; transition: background .15s; }
+.tema-btn-rename:hover { background: rgba(46,132,175,.1); }
+.tema-btn-delete:hover { background: rgba(192,57,43,.1); }
+
+/* ── Botão "Gerenciar Temas" na toolbar ─────────────────────────── */
+.tema-mgr-btn {
+    display: inline-flex; align-items: center; gap: .35rem;
+    background: none; border: 1.5px solid var(--border);
+    border-radius: 8px; padding: .4rem .85rem;
+    font-family: var(--font-aux); font-size: .72rem; font-weight: 600;
+    color: var(--text-muted); cursor: pointer;
+    letter-spacing: .04em; transition: all .2s;
+}
+.tema-mgr-btn:hover { background: var(--cream); color: var(--blue); border-color: var(--blue); }
+
+/* ── Dark mode — novos elementos ───────────────────────────────── */
+html.dark .contato-feedback--ok   { background: #0d3320; color: #5de38a; border-color: #1e6640; }
+html.dark .contato-feedback--erro { background: #3b1010; color: #f08080; border-color: #6b2020; }
+html.dark .temas-admin-box        { background: var(--card-bg); }
+html.dark .tema-row               { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.1); }
+html.dark .tema-row:hover         { background: rgba(255,255,255,.07); }
+html.dark .noticia-copy-link,
+html.dark .artigo-copy-link       { border-color: rgba(255,255,255,.12); }
