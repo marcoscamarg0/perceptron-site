@@ -10,12 +10,8 @@ function slugify(text) {
 
 function formatarConteudo(content) {
     if (!content || !content.trim()) return null;
-    return content.split('\n\n').filter(p => p.trim()).map(p => {
-        if (p.startsWith('## '))  return '<h2 class="artigo-h2">'  + p.replace('## ','')  + '</h2>';
-        if (p.startsWith('### ')) return '<h3 class="artigo-h3">'  + p.replace('### ','') + '</h3>';
-        if (p.startsWith('- '))   return '<ul class="artigo-list">' + p.split('\n').filter(l=>l.startsWith('- ')).map(l=>'<li>'+l.slice(2)+'</li>').join('') + '</ul>';
-        return '<p class="artigo-paragrafo">' + p.replace(/\n/g,'<br>') + '</p>';
-    }).join('');
+    // Usa markdownToHtml definido em noticiasPage.js para renderização consistente
+    return markdownToHtml(content);
 }
 
 function openArtigoPage(item) {
@@ -69,6 +65,13 @@ function renderArtigoContent(artigoPage, item) {
                 Voltar para Conteúdos
             </div>
 
+            <button class="artigo-copy-link" id="artigoCopyLink" title="Copiar link deste artigo">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                Copiar link
+            </button>
+
             <div class="artigo-container">
                 <div class="artigo-header">
                     <span class="artigo-tag">${item.tag}</span>
@@ -121,6 +124,18 @@ function renderArtigoContent(artigoPage, item) {
 
     // Voltar
     artigoPage.querySelector('#artigoBack').addEventListener('click', voltarParaNoticias);
+
+    // Copiar link
+    artigoPage.querySelector('#artigoCopyLink')?.addEventListener('click', () => {
+        const sl  = item.slug || slugify(item.title);
+        const url = `${window.location.origin}/artigo/${sl}`;
+        navigator.clipboard.writeText(url).then(() => {
+            const btn = artigoPage.querySelector('#artigoCopyLink');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✅ Link copiado!';
+            setTimeout(() => { btn.innerHTML = orig; }, 2000);
+        }).catch(() => { prompt('Copie o link:', url); });
+    });
 
     // Botão editar flutuante
     artigoPage.querySelector('#artigoEditBtn')?.addEventListener('click', () => {
@@ -193,7 +208,9 @@ function openEditorArtigo(item, onUpdated) {
     ov.className = 'modal-overlay active editor-overlay';
     ov.style.cssText = 'z-index:500;align-items:flex-start;padding:0;overflow-y:auto;';
 
-    const TAGS = ['Saneamento','Setor Elétrico','Rodovias','Gestão Pública','Concessões','Regulação','Infraestrutura','Geral'];
+    const TAGS = (AppState.temas && AppState.temas.length)
+        ? AppState.temas
+        : ['Saneamento','Setor Elétrico','Rodovias','Gestão Pública','Concessões','Regulação','Infraestrutura','Geral'];
 
     ov.innerHTML = `
         <div class="editor-box">
@@ -294,13 +311,7 @@ function openEditorArtigo(item, onUpdated) {
     function renderPrev() {
         const text = textarea.value;
         if (!text.trim()) { preview.innerHTML = '<p style="color:var(--text-muted);font-style:italic;font-size:.85rem">Pré-visualização...</p>'; return; }
-        const paras = text.split('\n\n').filter(p => p.trim());
-        preview.innerHTML = paras.map(p => {
-            if (p.startsWith('## '))  return '<h2 class="artigo-h2">'  + p.replace('## ','')  + '</h2>';
-            if (p.startsWith('### ')) return '<h3 class="artigo-h3">'  + p.replace('### ','') + '</h3>';
-            if (p.startsWith('- '))   return '<ul class="artigo-list">' + p.split('\n').filter(l=>l.startsWith('- ')).map(l=>'<li>'+l.slice(2)+'</li>').join('') + '</ul>';
-            return '<p class="artigo-paragrafo">' + p.replace(/\n/g,'<br>') + '</p>';
-        }).join('');
+        preview.innerHTML = markdownToHtml(text);
     }
     textarea.addEventListener('input', renderPrev);
     renderPrev();

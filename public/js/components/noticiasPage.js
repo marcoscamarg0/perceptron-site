@@ -1,46 +1,48 @@
-// Notícias fixas no frontend
+// Notícias fixas no frontend (fallback sem API)
 const NOTICIAS_FIXAS = [
-    { id:'1', title:'Marco Legal do Saneamento: desafios e oportunidades para municípios',               summary:'A Lei 14.026/2020 impõe novas exigências de universalização, equilíbrio tarifário e governança contratual. Entenda como estruturar contratos sustentáveis e mitigar riscos na prestação dos serviços.',                                                                                                                            date:'08/02/2025', tag:'Saneamento',    imageUrl:'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80' },
-    { id:'2', title:'Revisões tarifárias no setor elétrico: o papel da análise regulatória',             summary:'Processos de revisão tarifária periódica exigem análise técnica robusta e monitoramento por indicadores. A assimetria de informação entre regulador e regulado pode ser reduzida com dados bem estruturados e modelos econômico-financeiros.',                                                                                 date:'01/02/2025', tag:'Setor Elétrico', imageUrl:'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=900&q=80' },
-    { id:'3', title:'Concessões rodoviárias: como garantir governança e previsibilidade contratual',     summary:'A gestão eficiente de concessões rodoviárias requer monitoramento contínuo de CAPEX, OPEX, tráfego e níveis de serviço. Modelos e painéis de dados são fundamentais para decisões em fiscalização, revisões e reequilíbrios.',                                                                                                date:'25/01/2025', tag:'Rodovias',       imageUrl:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80' },
-    { id:'4', title:'Gestão pública municipal: como melhorar arrecadação e capacidade de investimento',  summary:'Diagnósticos estruturados e planos de ação orientados por indicadores permitem que municípios melhorem a saúde financeira e ampliem a capacidade de entrega de infraestrutura e serviços à população.',                                                                                                                         date:'15/01/2025', tag:'Gestão Pública', imageUrl:'' },
-    { id:'5', title:'PPPs e concessões: do modelo ao contrato executável',                               summary:'A estruturação de PPPs e concessões envolve modelagem econômico-financeira, matriz de riscos e mecanismos de remuneração adequados. Contratos bem desenhados reduzem disputas e aumentam a previsibilidade ao longo do ciclo de vida.',                                                                                       date:'10/01/2025', tag:'Concessões',     imageUrl:'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=900&q=80' }
+    { id:'1', title:'Marco Legal do Saneamento: desafios e oportunidades para municípios',               summary:'A Lei 14.026/2020 impõe novas exigências de universalização, equilíbrio tarifário e governança contratual.', date:'08/02/2025', tag:'Saneamento',    imageUrl:'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80', content:'', slug:'marco-legal-do-saneamento-desafios-e-oportunidades-para-municipios' },
+    { id:'2', title:'Revisões tarifárias no setor elétrico: o papel da análise regulatória',             summary:'Processos de revisão tarifária periódica exigem análise técnica robusta e monitoramento por indicadores.',   date:'01/02/2025', tag:'Setor Elétrico', imageUrl:'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=900&q=80', content:'', slug:'revisoes-tarifarias-no-setor-eletrico-o-papel-da-analise-regulatoria' },
+    { id:'3', title:'Concessões rodoviárias: como garantir governança e previsibilidade contratual',     summary:'A gestão eficiente de concessões rodoviárias requer monitoramento contínuo de CAPEX, OPEX, tráfego.',         date:'25/01/2025', tag:'Rodovias',       imageUrl:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80', content:'', slug:'concessoes-rodoviarias-como-garantir-governanca-e-previsibilidade-contratual' },
+    { id:'4', title:'Gestão pública municipal: como melhorar arrecadação e capacidade de investimento',  summary:'Diagnósticos estruturados e planos de ação orientados por indicadores permitem que municípios melhorem.',    date:'15/01/2025', tag:'Gestão Pública', imageUrl:'', content:'', slug:'gestao-publica-municipal-como-melhorar-arrecadacao-e-capacidade-de-investimento' },
+    { id:'5', title:'PPPs e concessões: do modelo ao contrato executável',                               summary:'A estruturação de PPPs e concessões envolve modelagem econômico-financeira, matriz de riscos.',             date:'10/01/2025', tag:'Concessões',     imageUrl:'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=900&q=80', content:'', slug:'ppps-e-concessoes-do-modelo-ao-contrato-executavel' },
 ];
 
 async function renderNoticiasPage() {
     const el = document.getElementById('noticiasPage');
 
-    // Carrega notícias do backend (MongoDB) — sincroniza entre todos os dispositivos
+    // Carrega notícias e temas do backend em paralelo
     try {
-        const dados = await API.getNoticias();
+        const [dados, temas] = await Promise.all([API.getNoticias(), API.getTemas()]);
         if (dados && dados.length) {
-            // Ordena: mais recentes primeiro (id maior = mais recente)
-            AppState.noticias = dados.sort((a, b) => {
-                // Notícias com id numérico grande (timestamp) vêm primeiro
-                const aNum = parseInt(a.id) || 0;
-                const bNum = parseInt(b.id) || 0;
-                return bNum - aNum;
-            });
+            AppState.noticias = dados.sort((a, b) => (parseInt(b.id)||0) - (parseInt(a.id)||0));
         } else {
             AppState.noticias = [...NOTICIAS_FIXAS];
         }
+        AppState.temas = temas || [];
     } catch(e) {
         // Fallback para localStorage se API indisponível
-        const savedEdits   = JSON.parse(localStorage.getItem('noticias_edits')   || '{}');
-        const savedExtras  = JSON.parse(localStorage.getItem('noticias_extras')  || '[]');
-        const deletedIds   = JSON.parse(localStorage.getItem('noticias_deleted') || '[]');
-        AppState.noticias  = NOTICIAS_FIXAS
+        const savedEdits  = JSON.parse(localStorage.getItem('noticias_edits')   || '{}');
+        const savedExtras = JSON.parse(localStorage.getItem('noticias_extras')  || '[]');
+        const deletedIds  = JSON.parse(localStorage.getItem('noticias_deleted') || '[]');
+        AppState.noticias = NOTICIAS_FIXAS
             .filter(n => !deletedIds.includes(n.id))
             .map(n => ({ ...n, ...(savedEdits[n.id] || {}) }));
-        AppState.noticias  = [...AppState.noticias, ...savedExtras];
+        AppState.noticias = [...AppState.noticias, ...savedExtras];
+        AppState.temas = ['Saneamento','Setor Elétrico','Rodovias','Gestão Pública','Concessões','Regulação','Infraestrutura','Geral'];
     }
 
+    renderNoticiasShell(el);
+    renderFiltrosTemas();
+    renderNoticiasGrid();
+}
+
+function renderNoticiasShell(el) {
     el.innerHTML = `
         <div class="page-hero">
             <div class="page-hero-inner">
                 <div class="page-hero-label">
                     <div class="page-hero-label-line"></div>
-                    <span class="page-hero-label-text">Publicações & Análises</span>
+                    <span class="page-hero-label-text">Publicações &amp; Análises</span>
                 </div>
                 <h1 class="page-hero-title">Notícias &<br><em>Artigos</em></h1>
                 <p class="page-hero-sub">Análises, artigos e publicações técnicas sobre regulação, infraestrutura, gestão pública e concessões.</p>
@@ -49,44 +51,50 @@ async function renderNoticiasPage() {
 
         <div class="noticias-content">
             <div class="noticias-toolbar">
-                <div class="noticias-filters">
+                <div class="noticias-filters" id="noticiasFilters">
                     <button class="filter-btn active" data-tag="todos">Todos</button>
-                    <button class="filter-btn" data-tag="Saneamento">Saneamento</button>
-                    <button class="filter-btn" data-tag="Setor Elétrico">Setor Elétrico</button>
-                    <button class="filter-btn" data-tag="Rodovias">Rodovias</button>
-                    <button class="filter-btn" data-tag="Gestão Pública">Gestão Pública</button>
-                    <button class="filter-btn" data-tag="Concessões">Concessões</button>
-                    <button class="filter-btn" data-tag="Regulação">Regulação</button>
-                    <button class="filter-btn" data-tag="Infraestrutura">Infraestrutura</button>
                 </div>
-                <button class="add-news-btn ${AppState.isAdminMode ? 'active' : ''}" id="addNewsBtn">
-                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                    </svg>
-                    Nova Publicação
-                </button>
+                <div style="display:flex;gap:.5rem;align-items:center">
+                    ${AppState.isAdminMode ? `<button class="tema-mgr-btn" id="temasAdminBtn" title="Gerenciar temas">🏷️ Temas</button>` : ''}
+                    <button class="add-news-btn ${AppState.isAdminMode ? 'active' : ''}" id="addNewsBtn">
+                        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
+                        Nova Publicação
+                    </button>
+                </div>
             </div>
             <div class="noticias-grid" id="noticiasGrid"></div>
         </div>
     `;
 
-    document.querySelectorAll('.filter-btn').forEach(btn =>
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderNoticiasGrid(btn.dataset.tag);
-        })
-    );
-
     document.getElementById('addNewsBtn').addEventListener('click', openAddNewsModal);
+    document.getElementById('temasAdminBtn')?.addEventListener('click', openTemasAdmin);
 
     document.addEventListener('authChanged', () => {
         const b = document.getElementById('addNewsBtn');
         if (b) b.classList.toggle('active', AppState.isAdminMode);
+        // Recarrega temas e atualiza botão gerenciar temas
+        renderNoticiasShell(document.getElementById('noticiasPage'));
+        renderFiltrosTemas();
         renderNoticiasGrid();
     });
+}
 
-    renderNoticiasGrid();
+function renderFiltrosTemas() {
+    const container = document.getElementById('noticiasFilters');
+    if (!container) return;
+    const temas = AppState.temas || [];
+    container.innerHTML = `<button class="filter-btn active" data-tag="todos">Todos</button>` +
+        temas.map(t => `<button class="filter-btn" data-tag="${t}">${t}</button>`).join('');
+
+    container.querySelectorAll('.filter-btn').forEach(btn =>
+        btn.addEventListener('click', () => {
+            container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderNoticiasGrid(btn.dataset.tag);
+        })
+    );
 }
 
 function renderNoticiasGrid(tag = 'todos') {
@@ -94,15 +102,8 @@ function renderNoticiasGrid(tag = 'todos') {
     if (!grid) return;
     grid.innerHTML = '';
 
-    // Ordena por mais recente (ids com timestamp maior = mais novos)
-    const sorted = [...AppState.noticias].sort((a, b) => {
-        const aNum = parseInt(a.id) || 0;
-        const bNum = parseInt(b.id) || 0;
-        return bNum - aNum;
-    });
-    const lista = tag === 'todos'
-        ? sorted
-        : sorted.filter(n => n.tag === tag);
+    const sorted = [...AppState.noticias].sort((a, b) => (parseInt(b.id)||0) - (parseInt(a.id)||0));
+    const lista = tag === 'todos' ? sorted : sorted.filter(n => n.tag === tag);
 
     if (lista.length === 0) {
         grid.innerHTML = `
@@ -120,6 +121,7 @@ function renderNoticiasGrid(tag = 'todos') {
         const card = document.createElement('div');
         card.className = `noticia-card${isFeatured ? ' featured' : ''}${AppState.isAdminMode ? ' admin-border' : ''}`;
         const hasImg = item.imageUrl && item.imageUrl.trim() !== '';
+        const slug   = item.slug || slugify(item.title);
 
         card.innerHTML = `
             <div class="noticia-img-wrap">
@@ -127,9 +129,7 @@ function renderNoticiasGrid(tag = 'todos') {
                     ? `<img class="noticia-img" src="${item.imageUrl}" alt="${item.title}" />`
                     : `<div class="noticia-img-placeholder">
                         <svg width="30" height="30" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="opacity:.2">
-                            <rect width="18" height="18" x="3" y="3" rx="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <path d="m21 15-5-5L5 21"/>
+                            <rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>
                         </svg>
                         <span>Sem imagem</span>
                        </div>`
@@ -139,8 +139,7 @@ function renderNoticiasGrid(tag = 'todos') {
                 <div class="noticia-img-upload-overlay">
                     <label class="upload-label">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
                         </svg>
                         Trocar imagem
                         <input type="file" class="upload-input" accept="image/*" />
@@ -156,18 +155,24 @@ function renderNoticiasGrid(tag = 'todos') {
                 </div>
                 <h2 class="noticia-title">${item.title}</h2>
                 <p class="noticia-summary">${item.summary}</p>
-                <div class="noticia-read-more">
-                    Ler artigo completo
-                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
+                <div style="display:flex;align-items:center;gap:.75rem;margin-top:auto">
+                    <div class="noticia-read-more">
+                        Ler artigo completo
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                    <button class="noticia-copy-link" title="Copiar link do artigo" data-slug="${slug}" aria-label="Copiar link">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
             <div class="noticia-admin-actions ${AppState.isAdminMode ? 'active' : ''}">
                 <button class="action-btn edit-btn">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                     </svg>
                 </button>
                 <button class="action-btn delete-btn">
@@ -178,25 +183,40 @@ function renderNoticiasGrid(tag = 'todos') {
             </div>
         `;
 
-        // upload imagem — salva no estado local
+        // Upload de imagem
         const fi = card.querySelector('.upload-input');
         if (fi) {
             fi.addEventListener('change', (e) => {
                 const f = e.target.files[0]; if (!f) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
+                resizeImage(f, 1200, 630, (url) => {
                     const idx = AppState.noticias.findIndex(x => x.id === item.id);
-                    if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], imageUrl: ev.target.result };
+                    if (idx !== -1) AppState.noticias[idx] = { ...AppState.noticias[idx], imageUrl: url };
                     saveNoticiasToStorage();
                     renderNoticiasGrid(document.querySelector('.filter-btn.active')?.dataset.tag || 'todos');
-                };
-                reader.readAsDataURL(f);
+                });
             });
         }
 
+        // Ler artigo
         card.querySelector('.noticia-read-more')?.addEventListener('click', () => {
             if (!AppState.isAdminMode) openArtigoPage(item);
         });
+
+        // Copiar link
+        card.querySelector('.noticia-copy-link')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const url = `${window.location.origin}/artigo/${slug}`;
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = e.currentTarget;
+                const orig = btn.innerHTML;
+                btn.innerHTML = '✅';
+                btn.title = 'Link copiado!';
+                setTimeout(() => { btn.innerHTML = orig; btn.title = 'Copiar link do artigo'; }, 2000);
+            }).catch(() => {
+                prompt('Copie o link:', `${window.location.origin}/artigo/${slug}`);
+            });
+        });
+
         card.querySelector('.edit-btn')?.addEventListener('click', () => openEditNewsModal(item));
         card.querySelector('.delete-btn')?.addEventListener('click', () => {
             if (!AppState.isAdminMode || !confirm('Excluir esta publicação?')) return;
@@ -210,23 +230,15 @@ function renderNoticiasGrid(tag = 'todos') {
 }
 
 function saveNoticiasToStorage(noticia, isDelete) {
-    // Salva no backend (MongoDB) — persiste em todos os dispositivos
     if (noticia && !isDelete) {
-        // Verifica se já existe no AppState (edição) ou é nova
         const jaExiste = AppState.noticias.some(n => n.id === noticia.id);
-        if (jaExiste && ['1','2','3','4','5'].includes(noticia.id)) {
+        if (jaExiste) {
             API.updateNoticia(noticia.id, noticia).catch(e => console.warn('API update:', e));
-        } else if (jaExiste) {
-            // Notícia extra já existe no banco — atualiza
-            API.updateNoticia(noticia.id, noticia).catch(e => {
-                // Se não existir ainda, cria
-                API.createNoticia(noticia).catch(e2 => console.warn('API create:', e2));
-            });
         } else {
             API.createNoticia(noticia).catch(e => console.warn('API create:', e));
         }
     }
-    // Backup no localStorage
+    // Backup localStorage
     const edits = {};
     AppState.noticias.filter(n => ['1','2','3','4','5'].includes(n.id)).forEach(n => { edits[n.id] = n; });
     localStorage.setItem('noticias_edits', JSON.stringify(edits));
@@ -236,18 +248,18 @@ function saveNoticiasToStorage(noticia, isDelete) {
 
 function openAddNewsModal() {
     let ov;
-    ov = buildNewsModal({ title: 'Nova Publicação',
+    ov = buildNewsModal({
+        title: 'Nova Publicação',
         onSave: async (d) => {
             const nova = { id: Date.now().toString(), ...d, date: d.date || new Date().toLocaleDateString('pt-BR') };
-            // Salva no banco PRIMEIRO
             try {
-                await API.createNoticia(nova);
+                const criada = await API.createNoticia(nova);
+                if (criada) nova.id = criada.id; // usa o id do servidor
                 console.log('✅ Notícia criada no banco');
-            } catch(e) {
-                console.warn('API createNoticia falhou:', e);
-            }
+            } catch(e) { console.warn('API createNoticia falhou:', e); }
             AppState.noticias = [nova, ...AppState.noticias];
             if (ov) ov.remove();
+            renderFiltrosTemas();
             renderNoticiasGrid();
         }
     });
@@ -256,16 +268,14 @@ function openAddNewsModal() {
 
 function openEditNewsModal(item) {
     let ov;
-    ov = buildNewsModal({ title: 'Editar Publicação', data: item,
+    ov = buildNewsModal({
+        title: 'Editar Publicação', data: item,
         onSave: async (d) => {
             const atualizado = { ...item, ...d };
-            // Salva no banco PRIMEIRO
             try {
                 await API.updateNoticia(item.id, atualizado);
                 console.log('✅ Notícia atualizada no banco');
-            } catch(e) {
-                console.warn('API updateNoticia falhou:', e);
-            }
+            } catch(e) { console.warn('API updateNoticia falhou:', e); }
             const idx = AppState.noticias.findIndex(x => x.id === item.id);
             if (idx !== -1) AppState.noticias[idx] = atualizado;
             if (ov) ov.remove();
@@ -280,7 +290,10 @@ function buildNewsModal({ title, data = {}, onSave }) {
     ov.className = 'modal-overlay active';
     ov.style.cssText = 'z-index:500;padding:0;align-items:flex-start;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);';
 
-    const TAGS = ['Saneamento','Setor Elétrico','Rodovias','Gestão Pública','Concessões','Regulação','Infraestrutura','Geral'];
+    // Temas dinâmicos — usa AppState.temas carregados do banco
+    const TAGS = (AppState.temas && AppState.temas.length)
+        ? AppState.temas
+        : ['Saneamento','Setor Elétrico','Rodovias','Gestão Pública','Concessões','Regulação','Infraestrutura','Geral'];
     const isEdit = !!data.id;
 
     ov.innerHTML = `
@@ -299,6 +312,9 @@ function buildNewsModal({ title, data = {}, onSave }) {
                 <label class="ned-label">Categoria</label>
                 <div class="ned-tags-grid" id="nmTagGrid">
                     ${TAGS.map(t => `<button class="ned-tag-btn ${data.tag===t?'active':''}" data-tag="${t}">${t}</button>`).join('')}
+                </div>
+                <div style="margin-top:.5rem">
+                    <button class="ned-tag-btn" id="nmNovoTemaBtn" style="width:100%;border-style:dashed">+ Novo tema</button>
                 </div>
             </div>
 
@@ -367,10 +383,31 @@ Separe os parágrafos com uma linha em branco.">${data.content||''}</textarea>
 
     // Tag selection
     ov.querySelectorAll('.ned-tag-btn').forEach(btn => {
+        if (btn.id === 'nmNovoTemaBtn') return;
         btn.addEventListener('click', () => {
             ov.querySelectorAll('.ned-tag-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         });
+    });
+
+    // Criar novo tema inline
+    ov.querySelector('#nmNovoTemaBtn').addEventListener('click', async () => {
+        const nome = prompt('Nome do novo tema:');
+        if (!nome || !nome.trim()) return;
+        await API.createTema(nome.trim());
+        AppState.temas = await API.getTemas();
+        // Adiciona o botão dinamicamente
+        const grid = ov.querySelector('#nmTagGrid');
+        const nb   = document.createElement('button');
+        nb.className     = 'ned-tag-btn active';
+        nb.dataset.tag   = nome.trim();
+        nb.textContent   = nome.trim();
+        grid.querySelectorAll('.ned-tag-btn').forEach(b => b.classList.remove('active'));
+        nb.addEventListener('click', () => {
+            grid.querySelectorAll('.ned-tag-btn').forEach(b => b.classList.remove('active'));
+            nb.classList.add('active');
+        });
+        grid.appendChild(nb);
     });
 
     // Image URL preview
@@ -380,15 +417,11 @@ Separe os parágrafos com uma linha em branco.">${data.content||''}</textarea>
     // Image upload
     ov.querySelector('#nmImgFile').addEventListener('change', (e) => {
         const file = e.target.files[0]; if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            resizeImage(file, 1200, 630, (url) => {
-                updateImgPreview(url);
-                imgInput.value = '';
-                imgInput.dataset.upload = url;
-            });
-        };
-        reader.readAsDataURL(file);
+        resizeImage(file, 1200, 630, (url) => {
+            updateImgPreview(url);
+            imgInput.value = '';
+            imgInput.dataset.upload = url;
+        });
     });
 
     function updateImgPreview(url) {
@@ -401,31 +434,23 @@ Separe os parágrafos com uma linha em branco.">${data.content||''}</textarea>
     }
 
     // Preview toggle
-    const textarea = ov.querySelector('#nmContent');
-    const previewEl = ov.querySelector('#nmPreview');
+    const textarea   = ov.querySelector('#nmContent');
+    const previewEl  = ov.querySelector('#nmPreview');
     const previewBtn = ov.querySelector('#nmPreviewToggle');
-    let previewing = false;
+    let previewing   = false;
 
     previewBtn.addEventListener('click', () => {
         previewing = !previewing;
-        textarea.style.display = previewing ? 'none' : 'block';
-        previewEl.style.display = previewing ? 'block' : 'none';
+        textarea.style.display   = previewing ? 'none'  : 'block';
+        previewEl.style.display  = previewing ? 'block' : 'none';
         previewBtn.classList.toggle('active', previewing);
-        previewBtn.querySelector('span, svg + *') ;
-        previewBtn.childNodes[1] && (previewBtn.childNodes[1].textContent = previewing ? ' Editar' : ' Prévia');
         if (previewing) renderPreview();
     });
 
     function renderPreview() {
         const text = textarea.value;
         if (!text.trim()) { previewEl.innerHTML = '<p style="color:var(--text-muted);font-style:italic">Nenhum conteúdo ainda...</p>'; return; }
-        const paras = text.split('\n\n').filter(p => p.trim());
-        previewEl.innerHTML = paras.map(p => {
-            if (p.startsWith('## '))  return '<h2 class="artigo-h2">'  + p.replace('## ','')  + '</h2>';
-            if (p.startsWith('### ')) return '<h3 class="artigo-h3">'  + p.replace('### ','') + '</h3>';
-            if (p.startsWith('- '))   return '<ul class="artigo-list">' + p.split('\n').filter(l=>l.startsWith('- ')).map(l=>'<li>'+l.slice(2)+'</li>').join('') + '</ul>';
-            return '<p class="artigo-paragrafo">' + p.replace(/\n/g,'<br>') + '</p>';
-        }).join('');
+        previewEl.innerHTML = markdownToHtml(text);
     }
 
     // Format buttons
@@ -451,15 +476,17 @@ Separe os parágrafos com uma linha em branco.">${data.content||''}</textarea>
     ov.querySelector('#nmSave').addEventListener('click', () => {
         const t = ov.querySelector('#nmTitle').value.trim();
         if (!t) { ov.querySelector('#nmTitle').focus(); ov.querySelector('#nmTitle').style.borderColor='var(--blue)'; return; }
-        const activeTag = ov.querySelector('.ned-tag-btn.active');
+        const activeTag = ov.querySelector('.ned-tag-btn.active:not(#nmNovoTemaBtn)');
         const tag = activeTag ? activeTag.dataset.tag : (data.tag || 'Geral');
         const imgUrl = imgInput.dataset.upload || imgInput.value.trim() || data.imageUrl || '';
+        const rawContent = textarea.value.trim();
         onSave({
             title:    t,
             summary:  ov.querySelector('#nmSummary').value.trim(),
             tag,
             imageUrl: imgUrl,
-            content:  textarea.value.trim(),
+            content:  rawContent,          // texto markdown — salvo no banco e renderizado no frontend
+            slug:     slugify(t),
             date:     data.date || new Date().toLocaleDateString('pt-BR')
         });
         setTimeout(() => {
@@ -473,4 +500,21 @@ Separe os parágrafos com uma linha em branco.">${data.content||''}</textarea>
     });
 
     return ov;
+}
+
+// ── Markdown leve → HTML (usado no preview e na exibição) ──
+function markdownToHtml(text) {
+    const paras = text.split('\n\n').filter(p => p.trim());
+    return paras.map(p => {
+        if (p.startsWith('## '))  return '<h2 class="artigo-h2">'  + inlineMarkdown(p.replace(/^## /,''))  + '</h2>';
+        if (p.startsWith('### ')) return '<h3 class="artigo-h3">'  + inlineMarkdown(p.replace(/^### /,'')) + '</h3>';
+        if (p.startsWith('- '))   return '<ul class="artigo-list">' + p.split('\n').filter(l=>l.startsWith('- ')).map(l=>'<li>'+inlineMarkdown(l.slice(2))+'</li>').join('') + '</ul>';
+        return '<p class="artigo-paragrafo">' + p.split('\n').map(inlineMarkdown).join('<br>') + '</p>';
+    }).join('');
+}
+
+function inlineMarkdown(line) {
+    return line
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')  // **negrito**
+        .replace(/_(.+?)_/g, '<em>$1</em>');                // _itálico_
 }
