@@ -41,3 +41,8 @@ coverage/
 # Temporary files
 *.tmp
 temp/
+
+# Backup archives — não versionar
+*.rar
+*.zip
+*.tar.gz

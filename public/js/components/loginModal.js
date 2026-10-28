@@ -47,13 +47,22 @@ function renderLoginModal() {
         pwInput.type = pwInput.type === 'password' ? 'text' : 'password';
     });
 
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async e => {
         e.preventDefault();
-        if (Auth.login(pwInput.value)) {
+        const submitBtn = form.querySelector('.modal-submit');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Verificando...';
+        errorMsg.classList.remove('show');
+        pwInput.classList.remove('error');
+
+        const ok = await Auth.login(pwInput.value);
+        if (ok) {
             close();
         } else {
             errorMsg.classList.add('show');
             pwInput.classList.add('error');
         }
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Entrar no Modo Edição';
     });
 }
